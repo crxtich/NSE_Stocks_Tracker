@@ -105,6 +105,30 @@ prices every 30 minutes during NSE trading hours (Monday–Friday, 09:00–15:30
 them straight to the database. The frontend reads that data live on every page load — there's
 no separate rebuild step required to see new prices.
 
+## Reading the data programmatically
+
+The database is a public, read-only Supabase REST API (PostgREST) — no scraping or headless
+browser needed to get the underlying data out. `price_snapshots` and `watchlist` are exposed
+directly, plus a `latest_price_snapshots` view (one row per ticker: its most recent snapshot)
+so a single call returns current market state without dedup logic.
+
+PostgREST normally expects the API key as an `apikey` header, which a plain link can't carry —
+but Supabase's gateway also accepts it as a query parameter, so these work as plain URLs (safe
+to share: this is the anon key, already public in the frontend bundle, and RLS restricts it to
+read-only regardless):
+
+```
+# Current price/volume for every tracked stock, sorted by % change
+https://lvtjtxtfminipebdwaxi.supabase.co/rest/v1/latest_price_snapshots?select=ticker,company_name,price,change_pct,volume,scraped_at&order=change_pct.desc&apikey=<anon key>
+
+# The 29-ticker watchlist
+https://lvtjtxtfminipebdwaxi.supabase.co/rest/v1/watchlist?select=*&apikey=<anon key>
+```
+
+(Get the current anon key from Project Settings → API in the Supabase dashboard.) Standard
+PostgREST query syntax applies for filtering/sorting/paging — see the
+[PostgREST docs](https://postgrest.org/en/stable/references/api/tables_views.html).
+
 ## Disclaimer
 
 This project is for informational purposes only. Nothing on this site constitutes financial
