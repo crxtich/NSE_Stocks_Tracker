@@ -8,6 +8,16 @@
 //
 // Also serves a lightweight health check:
 //   GET /scrape-nse?health=true  ->  { status: "ok", last_scrape: <timestamp> }
+//
+// Page structure (confirmed against the live site): a single #pricelist
+// table with four columns — NAME (ticker, linked), Price, Change (an up/down
+// arrow glyph plus a percentage — there is no separate absolute-KES change
+// on this page), and Volume (plain numbers, comma-separated, or "1.23M"-style
+// abbreviations for large counts). Section header rows ("Banking",
+// "Insurance", ...) are <th> rows with no <td class=nm>, so they're filtered
+// out naturally. Full company names aren't in the table at all — they live
+// in the <select id=stocks> ticker picker elsewhere on the page — so we
+// build a ticker -> company name lookup from that instead.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { DOMParser, type Element } from 'jsr:@b-fuze/deno-dom'
@@ -45,56 +55,83 @@ function isMarketOpenNow(): boolean {
   )
 }
 
-// Strips "Ksh", commas, "%", "+" and stray whitespace, then parses a number.
-// Returns null (rather than throwing) when the cleaned string has no digits,
-// so callers can treat missing/placeholder cells ("-", "N/A") as absent.
-function parseNumericCell(raw: string | undefined | null): number | null {
-  if (!raw) return null
-  const cleaned = raw
-    .replace(/ksh/gi, '')
-    .replace(/[,+%\s]/g, '')
-    .trim()
-  if (cleaned === '' || cleaned === '-' || cleaned === 'N/A') return null
-  const value = Number(cleaned)
-  return Number.isFinite(value) ? value : null
-}
-
 function textOf(el: Element | null | undefined): string {
   return (el?.textContent ?? '').trim()
 }
 
-// Parses the first data table on the price list page. The site's markup is
-// out of our control, so this is deliberately defensive: it looks up cells
-// by column header name where possible, falls back to positional indices,
-// and never lets one malformed row abort the rest of the scrape.
+// Strips commas/whitespace and parses a plain price/number cell. Returns
+// null (rather than throwing) for placeholder cells ("-", "N/A", empty).
+function parseNumericCell(raw: string | undefined | null): number | null {
+  if (!raw) return null
+  const cleaned = raw.replace(/,/g, '').trim()
+  if (cleaned === '' || cleaned === '-' || cleaned.toUpperCase() === 'N/A') return null
+  const value = Number(cleaned)
+  return Number.isFinite(value) ? value : null
+}
+
+// Volume cells are either plain comma-separated integers ("290,935"),
+// "-" for no trades, or abbreviated as e.g. "2.06M" for large counts.
+function parseVolumeCell(raw: string | undefined | null): number | null {
+  if (!raw) return null
+  const cleaned = raw.replace(/,/g, '').trim()
+  if (cleaned === '' || cleaned === '-') return null
+  const millions = cleaned.match(/^([\d.]+)\s*M$/i)
+  if (millions) {
+    const value = Number(millions[1])
+    return Number.isFinite(value) ? Math.round(value * 1_000_000) : null
+  }
+  const value = Number(cleaned)
+  return Number.isFinite(value) ? value : null
+}
+
+// Change cells render as an up/down triangle glyph plus a percentage
+// ("▲ 0.51%", "▼ 0.60%"), or "-" when the price hasn't moved. This page
+// exposes only the percentage — there is no absolute KES change value.
+function parseChangePctCell(raw: string | undefined | null): number | null {
+  if (!raw) return null
+  const magnitudeMatch = raw.match(/[\d.]+/)
+  if (!magnitudeMatch) return 0 // "-" (no movement)
+  const magnitude = Number(magnitudeMatch[0])
+  if (!Number.isFinite(magnitude)) return null
+  const isDown = raw.includes('▼') // ▼ (down-triangle glyph, &#9660;)
+  return isDown ? -magnitude : magnitude
+}
+
+// Full company names live in the ticker-picker <select>, not in the price
+// table itself, so we build a lookup from it. Index/sector-index entries
+// (e.g. "^NASI") use percent-encoded option values and are skipped — they
+// aren't individual securities and are excluded from the scrape entirely.
+function buildTickerNameMap(doc: ReturnType<DOMParser['parseFromString']>): Map<string, string> {
+  const map = new Map<string, string>()
+  if (!doc) return map
+  const options = doc.querySelectorAll('select#stocks option[value]')
+  for (const opt of Array.from(options)) {
+    const value = (opt as Element).getAttribute('value') ?? ''
+    if (!value || value.startsWith('%25')) continue
+    const name = textOf(opt as Element)
+    if (value && name) map.set(value.toUpperCase(), name)
+  }
+  return map
+}
+
+// Parses the #pricelist table. Deliberately defensive: never lets one
+// malformed row abort the rest of the scrape, and skips index rows (ticker
+// starting with "^") since those aren't individual tracked securities.
 function parsePriceTable(html: string): { rows: ParsedRow[]; failures: RowFailure[] } {
   const doc = new DOMParser().parseFromString(html, 'text/html')
   if (!doc) throw new Error('Failed to parse HTML document')
 
-  const table = doc.querySelector('table')
-  if (!table) throw new Error('No <table> found on page')
+  const table = doc.querySelector('#pricelist') ?? doc.querySelector('table')
+  if (!table) throw new Error('No price table found on page')
 
-  const headerCells = Array.from(table.querySelectorAll('thead th, tr:first-child th'))
-    .map((th) => textOf(th).toLowerCase())
+  const tickerNameMap = buildTickerNameMap(doc)
 
-  const colIndex = (...names: string[]) =>
-    headerCells.findIndex((h) => names.some((n) => h.includes(n)))
-
-  // Fall back to the documented column order if header detection fails:
-  // | # | Company | Ticker | Price | Change | % Change | Volume | ...
-  const idx = {
-    company: colIndex('company', 'name') >= 0 ? colIndex('company', 'name') : 1,
-    ticker: colIndex('ticker', 'symbol', 'code') >= 0 ? colIndex('ticker', 'symbol', 'code') : 2,
-    price: colIndex('price', 'last') >= 0 ? colIndex('price', 'last') : 3,
-    change: colIndex('change') >= 0 && colIndex('%') < 0 ? colIndex('change') : 4,
-    changePct: headerCells.findIndex((h) => h.includes('%')) >= 0
-      ? headerCells.findIndex((h) => h.includes('%'))
-      : 5,
-    volume: colIndex('volume', 'vol') >= 0 ? colIndex('volume', 'vol') : 6,
-  }
-
-  const bodyRows = Array.from(table.querySelectorAll('tbody tr'))
-  const dataRows = bodyRows.length > 0 ? bodyRows : Array.from(table.querySelectorAll('tr')).slice(1)
+  // Only rows with a "name" cell are data rows — this excludes both the
+  // column-header row and the bolded section-title rows ("Banking", etc.),
+  // which use <th> instead of <td class=nm>.
+  const dataRows = Array.from(table.querySelectorAll('tr')).filter((tr) =>
+    tr.querySelector('td.nm'),
+  )
 
   const rows: ParsedRow[] = []
   const failures: RowFailure[] = []
@@ -103,28 +140,25 @@ function parsePriceTable(html: string): { rows: ParsedRow[]; failures: RowFailur
     const raw = textOf(tr)
     try {
       const cells = Array.from(tr.querySelectorAll('td'))
-      if (cells.length === 0) return // skip stray header/spacer rows
+      const nameCell = cells[0]
+      const tickerRaw = textOf(nameCell?.querySelector('a')) || textOf(nameCell)
+      const ticker = tickerRaw.toUpperCase().replace(/[^A-Z0-9.\-]/g, '')
 
-      const tickerRaw = textOf(cells[idx.ticker])
-      const companyRaw = textOf(cells[idx.company])
-      const priceRaw = textOf(cells[idx.price])
+      if (!ticker || ticker.startsWith('^')) return // skip blanks and index rows
 
-      const ticker = tickerRaw.toUpperCase().replace(/[^A-Z0-9.]/g, '')
-      const companyName = companyRaw
-      const price = parseNumericCell(priceRaw)
-
-      if (!ticker || !companyName || price === null) {
-        failures.push({ index, reason: 'missing ticker, company name, or price', raw })
+      const price = parseNumericCell(textOf(cells[1]))
+      if (price === null) {
+        failures.push({ index, reason: 'missing or unparseable price', raw })
         return
       }
 
       rows.push({
         ticker,
-        companyName,
+        companyName: tickerNameMap.get(ticker) ?? ticker,
         price,
-        changeKsh: parseNumericCell(textOf(cells[idx.change])),
-        changePct: parseNumericCell(textOf(cells[idx.changePct])),
-        volume: parseNumericCell(textOf(cells[idx.volume])),
+        changeKsh: null, // not provided by this source — percentage change only
+        changePct: parseChangePctCell(textOf(cells[2])),
+        volume: parseVolumeCell(textOf(cells[3])),
       })
     } catch (err) {
       failures.push({ index, reason: err instanceof Error ? err.message : String(err), raw })
