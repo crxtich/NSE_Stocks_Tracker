@@ -21,10 +21,13 @@ export default function MarketOverview() {
     [latestByTicker],
   )
 
-  const { gainers, losers } = useMemo(() => {
+  const { gainers, losers, maxAbsChange } = useMemo(() => {
     const withChange = rows.filter((r) => r.changePct !== null)
     const sorted = [...withChange].sort((a, b) => (b.changePct ?? 0) - (a.changePct ?? 0))
-    return { gainers: sorted.slice(0, 5), losers: sorted.slice(-5).reverse() }
+    const gainers = sorted.slice(0, 5)
+    const losers = sorted.slice(-5).reverse()
+    const maxAbsChange = Math.max(0, ...[...gainers, ...losers].map((r) => Math.abs(r.changePct ?? 0)))
+    return { gainers, losers, maxAbsChange }
   }, [rows])
 
   return (
@@ -52,8 +55,8 @@ export default function MarketOverview() {
       {rows.length > 0 && (
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <MoversList title="Top 5 Movers — Up" rows={gainers} />
-            <MoversList title="Top 5 Movers — Down" rows={losers} />
+            <MoversList title="Top 5 Movers — Up" rows={gainers} maxAbsChange={maxAbsChange} />
+            <MoversList title="Top 5 Movers — Down" rows={losers} maxAbsChange={maxAbsChange} />
           </div>
           <PriceTable rows={rows} />
         </>
