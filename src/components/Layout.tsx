@@ -25,7 +25,18 @@ export default function Layout({ children }: { children: ReactNode }) {
               </span>
             </NavLink>
           </div>
-          <div className="shrink-0">
+          <div className="flex shrink-0 items-center gap-3">
+            <a
+              href="https://www.linkedin.com/in/crotich/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs text-ink-muted transition-colors hover:text-accent"
+            >
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0" fill="currentColor">
+                <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.15 1.45-2.15 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.59 0 4.25 2.37 4.25 5.44v6.3zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.11 20.45H3.56V9h3.55v11.45z" />
+              </svg>
+              <span className="hidden sm:inline">Built by Collins Rotich</span>
+            </a>
             <MarketStatusBadge />
           </div>
         </div>
