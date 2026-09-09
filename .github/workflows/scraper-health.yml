@@ -1,0 +1,41 @@
+name: Scraper Health Check
+
+# Periodically pings the scrape-nse Edge Function's health endpoint and fails
+# the run if the most recent snapshot is stale — a cheap early warning if the
+# Supabase cron schedule stops firing. This does not gate deploys.
+
+on:
+  schedule:
+    - cron: '15 6,12 * * 1-5' # 09:15 and 15:00 EAT on weekdays
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check last scrape timestamp
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ]; then
+            echo "VITE_SUPABASE_URL secret is not set — skipping health check."
+            exit 0
+          fi
+
+          RESPONSE=$(curl -sS "${VITE_SUPABASE_URL}/functions/v1/scrape-nse?health=true")
+          echo "Response: $RESPONSE"
+
+          LAST_SCRAPE=$(echo "$RESPONSE" | grep -o '"last_scrape":"[^"]*"' | cut -d'"' -f4)
+          if [ -z "$LAST_SCRAPE" ]; then
+            echo "::warning::Could not read last_scrape from health check response."
+            exit 0
+          fi
+
+          LAST_EPOCH=$(date -d "$LAST_SCRAPE" +%s)
+          NOW_EPOCH=$(date +%s)
+          AGE_MINUTES=$(( (NOW_EPOCH - LAST_EPOCH) / 60 ))
+          echo "Last scrape was $AGE_MINUTES minutes ago."
+
+          if [ "$AGE_MINUTES" -gt 120 ]; then
+            echo "::warning::Last scrape is over 2 hours old — check the Supabase cron schedule."
+          fi
