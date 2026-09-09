@@ -39,29 +39,32 @@ export default function TopPicks() {
 
       {top10.length > 0 && (
         <div className="overflow-x-auto rounded-lg border border-canvas-border">
-          <table className="w-full min-w-[720px] border-collapse text-sm">
+          <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="border-b border-canvas-border bg-canvas-panel text-xs uppercase tracking-wide text-ink-muted">
-                <th className="px-3 py-2.5 text-left font-medium">#</th>
+                <th className="hidden px-3 py-2.5 text-left font-medium sm:table-cell">#</th>
                 <th className="px-3 py-2.5 text-left font-medium">Company</th>
-                <th className="px-3 py-2.5 text-right font-medium">Price</th>
-                <th className="px-3 py-2.5 text-right font-medium">30-Day Return</th>
+                <th className="px-3 py-2.5 text-right font-medium">
+                  Price <span className="hidden sm:inline">/ 30D Return</span>
+                </th>
                 <th className="px-3 py-2.5 text-left font-medium">Signal Score</th>
               </tr>
             </thead>
             <tbody>
               {top10.map((a, i) => (
                 <tr key={a.ticker} className="border-b border-canvas-border/60 last:border-0 hover:bg-canvas-panel/60">
-                  <td className="px-3 py-3 text-ink-faint">{i + 1}</td>
+                  <td className="hidden px-3 py-3 text-ink-faint sm:table-cell">{i + 1}</td>
                   <td className="px-3 py-3">
                     <Link to={`/stock/${a.ticker}`} className="hover:opacity-80">
                       <div className="font-mono text-xs font-semibold text-accent">{a.ticker}</div>
-                      <div className="text-ink">{a.companyName}</div>
+                      <div className="max-w-[110px] truncate text-ink sm:max-w-none">{a.companyName}</div>
                     </Link>
                   </td>
-                  <td className="px-3 py-3 text-right tabular text-ink">{formatKsh(a.latestPrice)}</td>
                   <td className="px-3 py-3 text-right">
-                    <ChangeValue value={a.returns.d30} />
+                    <div className="tabular text-ink">{formatKsh(a.latestPrice)}</div>
+                    <div className="mt-0.5 text-xs">
+                      <ChangeValue value={a.returns.d30} />
+                    </div>
                   </td>
                   <td className="px-3 py-3">
                     <SignalScoreBadge score={a.signal.score} band={a.signal.band} size="sm" />

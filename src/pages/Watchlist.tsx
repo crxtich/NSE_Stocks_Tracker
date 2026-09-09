@@ -38,12 +38,13 @@ export default function Watchlist() {
 
       {rows.length > 0 && (
         <div className="overflow-x-auto rounded-lg border border-canvas-border">
-          <table className="w-full min-w-[720px] border-collapse text-sm">
+          <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="border-b border-canvas-border bg-canvas-panel text-xs uppercase tracking-wide text-ink-muted">
                 <th className="px-3 py-2.5 text-left font-medium">Company</th>
-                <th className="px-3 py-2.5 text-right font-medium">Price</th>
-                <th className="px-3 py-2.5 text-right font-medium">30-Day Return</th>
+                <th className="px-3 py-2.5 text-right font-medium">
+                  Price <span className="hidden sm:inline">/ 30D Return</span>
+                </th>
                 <th className="px-3 py-2.5 text-left font-medium">Signal Score</th>
               </tr>
             </thead>
@@ -53,14 +54,16 @@ export default function Watchlist() {
                   <td className="px-3 py-3">
                     <Link to={`/stock/${entry.ticker}`} className="hover:opacity-80">
                       <div className="font-mono text-xs font-semibold text-accent">{entry.ticker}</div>
-                      <div className="text-ink">{entry.company_name}</div>
+                      <div className="max-w-[130px] truncate text-ink sm:max-w-none">{entry.company_name}</div>
                     </Link>
                   </td>
-                  <td className="px-3 py-3 text-right tabular text-ink">
-                    {analysis ? formatKsh(analysis.latestPrice) : <span className="text-ink-faint">—</span>}
-                  </td>
                   <td className="px-3 py-3 text-right">
-                    <ChangeValue value={analysis?.returns.d30 ?? null} />
+                    <div className="tabular text-ink">
+                      {analysis ? formatKsh(analysis.latestPrice) : <span className="text-ink-faint">—</span>}
+                    </div>
+                    <div className="mt-0.5 text-xs">
+                      <ChangeValue value={analysis?.returns.d30 ?? null} />
+                    </div>
                   </td>
                   <td className="px-3 py-3">
                     {analysis ? (

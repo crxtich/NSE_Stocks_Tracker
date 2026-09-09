@@ -41,14 +41,14 @@ export default function Layout({ children }: { children: ReactNode }) {
           </div>
         </div>
         <nav className="border-t border-canvas-border/60">
-          <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 sm:px-6">
+          <div className="mx-auto flex max-w-7xl overflow-x-auto px-4 sm:gap-1 sm:px-6">
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.end}
                 className={({ isActive }) =>
-                  `whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium transition-colors ${
+                  `whitespace-nowrap border-b-2 px-2 py-2.5 text-[13px] font-medium transition-colors sm:px-3 sm:text-sm ${
                     isActive
                       ? 'border-accent text-ink'
                       : 'border-transparent text-ink-muted hover:text-ink'

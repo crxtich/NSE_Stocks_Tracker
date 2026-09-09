@@ -52,15 +52,18 @@ export default function SignalScoreBadge({
   }[size]
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3" title={`${style.label} — ${score} out of 100`}>
       <div
         className={`flex ${sizeClasses} shrink-0 items-center justify-center rounded-full font-display font-semibold tabular ring-2 ${style.bg} ${style.text} ${style.ring} ${animate ? 'animate-countup' : ''}`}
       >
         {display}
       </div>
-      <div className="flex flex-col">
-        <span className={`text-sm font-semibold ${style.text}`}>{style.label}</span>
-        <span className="text-xs text-ink-faint">out of 100</span>
+      {/* On the compact (table-row) size, the label is hidden below `sm` — other
+          columns already claim most of a phone's width, so the label's box would
+          render mostly off-screen; the circle's color + score still convey the band. */}
+      <div className={`min-w-0 max-w-[110px] flex-col ${size === 'sm' ? 'hidden sm:flex' : 'flex'}`}>
+        <span className={`block truncate text-sm font-semibold ${style.text}`}>{style.label}</span>
+        <span className="block truncate text-xs text-ink-faint">out of 100</span>
       </div>
     </div>
   )

@@ -14,6 +14,11 @@ export interface PriceRow {
 
 type SortKey = 'companyName' | 'price' | 'changeKsh' | 'changePct' | 'volume'
 
+// Change (KSH) and Volume are hidden below `sm` — on a phone-width screen,
+// ticker/company/price/%change are what matters at a glance; the rest is
+// one tap away on the stock detail page.
+const HIDE_ON_MOBILE: Partial<Record<SortKey, boolean>> = { changeKsh: true, volume: true }
+
 export default function PriceTable({ rows }: { rows: PriceRow[] }) {
   const [sortKey, setSortKey] = useState<SortKey>('changePct')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
@@ -54,14 +59,14 @@ export default function PriceTable({ rows }: { rows: PriceRow[] }) {
 
   return (
     <div className="overflow-x-auto rounded-lg border border-canvas-border">
-      <table className="w-full min-w-[640px] border-collapse text-sm">
+      <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-canvas-border bg-canvas-panel text-xs uppercase tracking-wide text-ink-muted">
-            <th className="w-10 px-3 py-2.5 text-left font-medium">Ticker</th>
+            <th className="px-3 py-2.5 text-left font-medium">Ticker</th>
             {headers.map((h) => (
               <th
                 key={h.key}
-                className={`cursor-pointer select-none px-3 py-2.5 font-medium hover:text-ink ${h.align === 'right' ? 'text-right' : 'text-left'}`}
+                className={`cursor-pointer select-none px-3 py-2.5 font-medium hover:text-ink ${h.align === 'right' ? 'text-right' : 'text-left'} ${HIDE_ON_MOBILE[h.key] ? 'hidden sm:table-cell' : ''}`}
                 onClick={() => toggleSort(h.key)}
               >
                 <span className="inline-flex items-center gap-1">
@@ -80,17 +85,19 @@ export default function PriceTable({ rows }: { rows: PriceRow[] }) {
               className="cursor-pointer border-b border-canvas-border/60 last:border-0 hover:bg-canvas-panel/60"
             >
               <td className="px-3 py-2.5 font-mono text-xs font-semibold text-accent">{row.ticker}</td>
-              <td className="max-w-[220px] truncate px-3 py-2.5 text-ink" title={row.companyName}>
+              <td className="max-w-[120px] truncate px-3 py-2.5 text-ink sm:max-w-[220px]" title={row.companyName}>
                 {row.companyName}
               </td>
               <td className="px-3 py-2.5 text-right tabular text-ink">{formatKsh(row.price)}</td>
-              <td className="px-3 py-2.5 text-right">
+              <td className="hidden px-3 py-2.5 text-right sm:table-cell">
                 <ChangeValue value={row.changeKsh} />
               </td>
               <td className="px-3 py-2.5 text-right">
                 <ChangeValue value={row.changePct} />
               </td>
-              <td className="px-3 py-2.5 text-right tabular text-ink-muted">{formatCompactVolume(row.volume)}</td>
+              <td className="hidden px-3 py-2.5 text-right tabular text-ink-muted sm:table-cell">
+                {formatCompactVolume(row.volume)}
+              </td>
             </tr>
           ))}
           {sorted.length === 0 && (
