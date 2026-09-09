@@ -47,16 +47,6 @@ export function toDailyCloses(snapshots: PriceSnapshot[]): DailyClose[] {
     .map(([date, snap]) => ({ date, price: snap.price, volume: snap.volume }))
 }
 
-export function groupByTicker(snapshots: PriceSnapshot[]): Map<string, PriceSnapshot[]> {
-  const map = new Map<string, PriceSnapshot[]>()
-  for (const snap of snapshots) {
-    const list = map.get(snap.ticker)
-    if (list) list.push(snap)
-    else map.set(snap.ticker, [snap])
-  }
-  return map
-}
-
 // ---------------------------------------------------------------------------
 // Small statistics helpers
 // ---------------------------------------------------------------------------

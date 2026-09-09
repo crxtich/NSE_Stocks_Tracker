@@ -35,8 +35,10 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['"IBM Plex Serif"', 'ui-serif', 'Georgia', 'serif'],
+        // System font stacks only — no webfont CDN calls, so the page ships
+        // with zero font-loading network requests and no layout shift.
+        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        display: ['ui-serif', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
       },
       fontFeatureSettings: {
         tabular: '"tnum"',

@@ -9,11 +9,6 @@ export function formatPct(value: number | null | undefined, decimals = 2): strin
   return `${sign}${value.toFixed(decimals)}%`
 }
 
-export function formatNumber(value: number | null | undefined): string {
-  if (value === null || value === undefined || Number.isNaN(value)) return '—'
-  return value.toLocaleString('en-KE')
-}
-
 export function formatCompactVolume(value: number | null | undefined): string {
   if (value === null || value === undefined || Number.isNaN(value)) return '—'
   return new Intl.NumberFormat('en-KE', { notation: 'compact', maximumFractionDigits: 1 }).format(value)

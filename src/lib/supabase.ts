@@ -1,9 +1,12 @@
-import { createClient } from '@supabase/supabase-js'
+// Talks to Supabase's auto-generated PostgREST API directly over `fetch` —
+// no @supabase/supabase-js client. The frontend only ever does simple,
+// read-only GET queries against two tables, so the ~59kB gzip client
+// library (built for auth flows, realtime, storage, etc. this app never
+// uses) isn't worth shipping to every visitor.
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   // Fails loudly in dev/build rather than silently returning empty data.
   console.error(
     'Missing VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY. Copy .env.example to .env and fill in your project values.',
@@ -12,9 +15,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 // Read-only from the frontend's perspective: the anon key can only SELECT,
 // per the Row Level Security policies in supabase/migrations/001_initial_schema.sql.
-// Falls back to a syntactically valid placeholder URL when env vars are missing
-// so the app can still render its error/empty states instead of crashing outright.
-export const supabase = createClient(supabaseUrl || 'https://placeholder.supabase.co', supabaseAnonKey || 'placeholder')
+async function restGet<T>(path: string): Promise<T> {
+  const url = `${SUPABASE_URL}/rest/v1/${path}`
+  const res = await fetch(url, {
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    },
+  })
+  if (!res.ok) throw new Error(`Supabase request failed (${res.status}): ${path}`)
+  return res.json() as Promise<T>
+}
 
 export interface PriceSnapshot {
   id: number
@@ -34,48 +45,14 @@ export interface WatchlistEntry {
 }
 
 export async function fetchWatchlist(): Promise<WatchlistEntry[]> {
-  const { data, error } = await supabase.from('watchlist').select('*').order('ticker')
-  if (error) throw error
-  return data ?? []
+  return restGet<WatchlistEntry[]>('watchlist?select=*&order=ticker')
 }
 
 // Fetches every snapshot within the last `days` days, across all tickers,
 // ordered oldest -> newest so downstream analysis can walk it chronologically.
 export async function fetchHistory(days: number): Promise<PriceSnapshot[]> {
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
-  const { data, error } = await supabase
-    .from('price_snapshots')
-    .select('*')
-    .gte('scraped_at', since)
-    .order('scraped_at', { ascending: true })
-  if (error) throw error
-  return data ?? []
-}
-
-export async function fetchTickerHistory(ticker: string, days: number): Promise<PriceSnapshot[]> {
-  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
-  const { data, error } = await supabase
-    .from('price_snapshots')
-    .select('*')
-    .eq('ticker', ticker)
-    .gte('scraped_at', since)
-    .order('scraped_at', { ascending: true })
-  if (error) throw error
-  return data ?? []
-}
-
-// The most recent snapshot per ticker — used for "current" price, change, volume.
-export async function fetchLatestByTicker(): Promise<Map<string, PriceSnapshot>> {
-  const { data, error } = await supabase
-    .from('price_snapshots')
-    .select('*')
-    .order('scraped_at', { ascending: false })
-    .limit(2000)
-  if (error) throw error
-
-  const latest = new Map<string, PriceSnapshot>()
-  for (const row of data ?? []) {
-    if (!latest.has(row.ticker)) latest.set(row.ticker, row)
-  }
-  return latest
+  return restGet<PriceSnapshot[]>(
+    `price_snapshots?select=*&scraped_at=gte.${encodeURIComponent(since)}&order=scraped_at.asc`,
+  )
 }

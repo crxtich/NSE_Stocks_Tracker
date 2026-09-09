@@ -24,7 +24,6 @@ interface MarketDataState {
   /** Most recent snapshot per ticker — current price, session change, volume. */
   latestByTicker: Map<string, PriceSnapshot>
   getAnalysis: (ticker: string) => TickerAnalysis | undefined
-  refresh: () => void
 }
 
 const MarketDataContext = createContext<MarketDataState | null>(null)
@@ -34,7 +33,6 @@ export function MarketDataProvider({ children }: { children: ReactNode }) {
   const [watchlist, setWatchlist] = useState<WatchlistEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [tick, setTick] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -58,7 +56,7 @@ export function MarketDataProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true
     }
-  }, [tick])
+  }, [])
 
   const { analyses, lastUpdated } = useMemo(() => {
     const nameByTicker = new Map<string, string>()
@@ -114,7 +112,6 @@ export function MarketDataProvider({ children }: { children: ReactNode }) {
     analyses,
     latestByTicker,
     getAnalysis: (ticker: string) => analysisByTicker.get(ticker),
-    refresh: () => setTick((t) => t + 1),
   }
 
   return <MarketDataContext.Provider value={value}>{children}</MarketDataContext.Provider>

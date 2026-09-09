@@ -6,15 +6,4 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/NSE_Stocks_Tracker/',
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          react: ['react', 'react-dom', 'react-router-dom'],
-          charts: ['recharts'],
-          supabase: ['@supabase/supabase-js'],
-        },
-      },
-    },
-  },
 })
