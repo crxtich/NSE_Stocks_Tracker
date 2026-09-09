@@ -19,7 +19,7 @@ anyone, not just finance professionals.
 | Charts | Recharts | Lightweight, composable charting built on SVG. |
 | Styling | Tailwind CSS | Utility-first styling that keeps the dark, data-dense design consistent. |
 | Hosting | GitHub Pages | Free static hosting, deployed automatically from CI. |
-| CI/CD | GitHub Actions | Builds the frontend and publishes it to the `gh-pages` branch on every push to `main`. |
+| CI/CD | GitHub Actions | Builds the frontend and deploys it straight to GitHub Pages (native Actions deployment — no separate build branch) on every push. |
 
 ## What's on the site
 
@@ -93,9 +93,10 @@ In your fork's **Settings → Secrets and variables → Actions**, add:
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 
-Push to `main` — GitHub Actions will build the site and publish it to the `gh-pages` branch
-automatically. Enable GitHub Pages for the repo (**Settings → Pages**) with the source set to
-the `gh-pages` branch, if it isn't already.
+In **Settings → Pages → Build and deployment → Source**, choose **GitHub Actions** (not
+"Deploy from a branch" — there is no build-output branch in this setup, the workflow uploads
+the built site directly). Push to your default branch — GitHub Actions will build the site and
+deploy it automatically on every push, no extra branch required.
 
 ## How it stays up to date
 
