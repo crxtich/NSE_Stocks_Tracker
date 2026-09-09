@@ -26,7 +26,7 @@ anyone, not just finance professionals.
 - **Market Overview** — every tracked stock's live price, session change, and volume, sortable, with today's top 5 gainers and losers.
 - **Top 10 Picks** — the ten highest-scoring stocks by the quantitative Market Signal Score, with a plain-English explanation of the methodology.
 - **Stock Detail** — price and volume history charts with a 20-day moving average overlay, plus every underlying metric explained in plain language.
-- **Watchlist** — the same analysis applied to a fixed set of 29 tracked companies.
+- **My Watchlist** — the same analysis applied to a fixed set of 29 tracked companies.
 
 Every score on the site is a mathematical signal derived from price and volume data — never a
 buy or sell recommendation. See the disclaimer on every analysis page.

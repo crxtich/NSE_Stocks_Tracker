@@ -5,7 +5,7 @@ import MarketStatusBadge from './MarketStatusBadge'
 const NAV_ITEMS = [
   { to: '/', label: 'Market Overview', end: true },
   { to: '/top-picks', label: 'Top 10 Picks', end: false },
-  { to: '/watchlist', label: 'Watchlist', end: false },
+  { to: '/watchlist', label: 'My Watchlist', end: false },
 ]
 
 export default function Layout({ children }: { children: ReactNode }) {

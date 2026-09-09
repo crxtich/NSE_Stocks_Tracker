@@ -21,7 +21,7 @@ export default function Watchlist() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-ink sm:text-3xl">Watchlist</h1>
+        <h1 className="font-display text-2xl font-semibold text-ink sm:text-3xl">My Watchlist</h1>
         <p className="mt-1 max-w-2xl text-sm text-ink-muted">
           29 tracked companies across banking, manufacturing, agriculture, and telecoms, with the
           same quantitative analysis applied to every stock on the exchange.
