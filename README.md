@@ -6,7 +6,7 @@ quantitative signals — momentum, trend, stability, and a single composite scor
 without relying on news, analyst opinions, or company fundamentals. It's built to be read by
 anyone, not just finance professionals.
 
-> _Add a screenshot of your deployed site here once it's live — e.g. `docs/screenshot.png`._
+**Live site:** [crxtich.github.io/NSE_Stocks_Tracker](https://crxtich.github.io/NSE_Stocks_Tracker/)
 
 ## Tech stack
 
@@ -134,3 +134,7 @@ PostgREST query syntax applies for filtering/sorting/paging — see the
 This project is for informational purposes only. Nothing on this site constitutes financial
 advice. All analysis is derived purely from historical price and trading-volume data and is not
 a recommendation to buy or sell any security.
+
+## Author
+
+Built by [Collins Rotich](https://www.linkedin.com/in/crotich/).
