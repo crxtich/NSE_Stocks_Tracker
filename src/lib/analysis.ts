@@ -13,6 +13,12 @@
 // across most equity markets and is close enough for this purpose.
 const TRADING_DAYS_PER_YEAR = 252
 
+// The lookback window shared by the Trend and Volume Confirmation signal
+// components (20-day moving average, 20-day volume average). Exported so the
+// UI can tell visitors exactly how much history those components still need,
+// instead of hardcoding a day count that could drift out of sync with this.
+export const SIGNAL_WINDOW_DAYS = 20
+
 import type { PriceSnapshot } from './supabase'
 
 export interface DailyClose {
@@ -45,6 +51,16 @@ export function toDailyCloses(snapshots: PriceSnapshot[]): DailyClose[] {
   return Array.from(byDate.entries())
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, snap]) => ({ date, price: snap.price, volume: snap.volume }))
+}
+
+/** How many distinct calendar days (EAT) of price history have been collected so far, across every tracked ticker. */
+export function distinctTradingDayCount(snapshots: PriceSnapshot[]): number {
+  const dates = new Set<string>()
+  for (const snap of snapshots) {
+    const eatMs = new Date(snap.scraped_at).getTime() + 3 * 60 * 60 * 1000
+    dates.add(new Date(eatMs).toISOString().slice(0, 10))
+  }
+  return dates.size
 }
 
 // ---------------------------------------------------------------------------
@@ -122,14 +138,15 @@ export interface MovingAverageSignal {
 
 export function movingAverageSignal(daily: DailyClose[]): MovingAverageSignal {
   const prices = daily.map((d) => d.price)
-  const ma20 = simpleMovingAverage(prices, 20)
+  const ma20 = simpleMovingAverage(prices, SIGNAL_WINDOW_DAYS)
   if (ma20 === null || prices.length === 0) {
     return { ma20: null, pctVsMa20: null, direction: 'unknown' }
   }
   const latest = prices[prices.length - 1]
   const pctVsMa20 = ((latest - ma20) / ma20) * 100
 
-  const ma20FiveDaysAgo = prices.length >= 25 ? simpleMovingAverage(prices.slice(0, -5), 20) : null
+  const ma20FiveDaysAgo =
+    prices.length >= SIGNAL_WINDOW_DAYS + 5 ? simpleMovingAverage(prices.slice(0, -5), SIGNAL_WINDOW_DAYS) : null
   let direction: MovingAverageSignal['direction'] = 'unknown'
   if (ma20FiveDaysAgo !== null) {
     const delta = ma20 - ma20FiveDaysAgo
@@ -171,7 +188,7 @@ export function fiftyTwoWeekRange(daily: DailyClose[]): FiftyTwoWeekRange {
 export function historicalVolatility(daily: DailyClose[]): number | null {
   const returns = dailyReturns(daily)
   if (returns.length < 5) return null
-  const window = returns.slice(-20)
+  const window = returns.slice(-SIGNAL_WINDOW_DAYS)
   return stdev(window) * Math.sqrt(TRADING_DAYS_PER_YEAR) * 100
 }
 
@@ -264,7 +281,7 @@ export interface VolumeTrend {
 export function volumeTrend(daily: DailyClose[]): VolumeTrend {
   const volumes = daily.map((d) => d.volume).filter((v): v is number => v !== null)
   const avg5 = simpleMovingAverage(volumes, 5)
-  const avg20 = simpleMovingAverage(volumes, 20)
+  const avg20 = simpleMovingAverage(volumes, SIGNAL_WINDOW_DAYS)
   return { avg5, avg20, ratio: avg5 !== null && avg20 !== null && avg20 > 0 ? avg5 / avg20 : null }
 }
 
@@ -277,7 +294,7 @@ export type PriceVolumeSignal =
 
 /** Compares the direction of the 20-day price trend against the direction of the volume trend. */
 export function priceVolumeDivergence(daily: DailyClose[]): PriceVolumeSignal {
-  const priceChange = absoluteReturn(daily, 20)
+  const priceChange = absoluteReturn(daily, SIGNAL_WINDOW_DAYS)
   const { ratio } = volumeTrend(daily)
   if (priceChange === null || ratio === null) return 'insufficient-data'
   const volumeRising = ratio > 1

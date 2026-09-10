@@ -8,6 +8,7 @@ import MetricTile from '../components/MetricTile'
 import SignalScoreBadge from '../components/SignalScoreBadge'
 import ChangeValue from '../components/ChangeValue'
 import Disclaimer from '../components/Disclaimer'
+import DataMaturityNotice from '../components/DataMaturityNotice'
 import { formatEatTime, formatKsh, formatPct } from '../lib/format'
 import { LoadingState, ErrorState, EmptyState } from '../components/StateViews'
 
@@ -188,6 +189,8 @@ export default function StockDetail() {
           />
         </div>
       </section>
+
+      <DataMaturityNotice />
 
       <section className="rounded-lg border border-canvas-border bg-canvas-panel p-4">
         <h2 className="text-sm font-semibold text-ink">Signal Score Breakdown</h2>

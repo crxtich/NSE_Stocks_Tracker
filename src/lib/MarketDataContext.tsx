@@ -8,6 +8,7 @@ import {
 import {
   analyzeTicker,
   buildMarketDailyReturns,
+  distinctTradingDayCount,
   toDailyCloses,
   type TickerAnalysis,
 } from './analysis'
@@ -24,6 +25,8 @@ interface MarketDataState {
   /** Most recent snapshot per ticker — current price, session change, volume. */
   latestByTicker: Map<string, PriceSnapshot>
   getAnalysis: (ticker: string) => TickerAnalysis | undefined
+  /** Distinct calendar days of price history collected so far, across every tracked ticker. */
+  daysOfHistory: number
 }
 
 const MarketDataContext = createContext<MarketDataState | null>(null)
@@ -104,6 +107,8 @@ export function MarketDataProvider({ children }: { children: ReactNode }) {
     return map
   }, [history])
 
+  const daysOfHistory = useMemo(() => distinctTradingDayCount(history), [history])
+
   const value: MarketDataState = {
     loading,
     error,
@@ -112,6 +117,7 @@ export function MarketDataProvider({ children }: { children: ReactNode }) {
     analyses,
     latestByTicker,
     getAnalysis: (ticker: string) => analysisByTicker.get(ticker),
+    daysOfHistory,
   }
 
   return <MarketDataContext.Provider value={value}>{children}</MarketDataContext.Provider>

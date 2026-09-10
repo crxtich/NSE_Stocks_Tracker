@@ -4,6 +4,7 @@ import { useMarketData } from '../lib/MarketDataContext'
 import SignalScoreBadge from '../components/SignalScoreBadge'
 import ChangeValue from '../components/ChangeValue'
 import Disclaimer from '../components/Disclaimer'
+import DataMaturityNotice from '../components/DataMaturityNotice'
 import { formatKsh } from '../lib/format'
 import { LoadingState, ErrorState, EmptyState } from '../components/StateViews'
 
@@ -27,6 +28,7 @@ export default function TopPicks() {
       </div>
 
       <Disclaimer />
+      <DataMaturityNotice />
 
       {loading && analyses.length === 0 && <LoadingState />}
       {error && <ErrorState message={error} />}
