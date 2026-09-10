@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
 import MarketStatusBadge from './MarketStatusBadge'
+import ExportModal from './ExportModal'
 
 const NAV_ITEMS = [
   { to: '/', label: 'Market Overview', end: true },
@@ -9,6 +10,8 @@ const NAV_ITEMS = [
 ]
 
 export default function Layout({ children }: { children: ReactNode }) {
+  const [exportOpen, setExportOpen] = useState(false)
+
   return (
     <div className="min-h-screen bg-canvas">
       <header className="sticky top-0 z-20 border-b border-canvas-border bg-canvas/90 backdrop-blur">
@@ -37,6 +40,19 @@ export default function Layout({ children }: { children: ReactNode }) {
               </svg>
               <span className="hidden sm:inline">Built by Collins Rotich</span>
             </a>
+            <button
+              type="button"
+              onClick={() => setExportOpen(true)}
+              title="Export data"
+              aria-label="Export data"
+              className="flex items-center gap-1.5 rounded-md border border-canvas-border px-2 py-1 text-xs text-ink-muted transition-colors hover:border-accent/50 hover:text-accent"
+            >
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 3v12m0 0-4-4m4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="hidden sm:inline">Export</span>
+            </button>
             <MarketStatusBadge />
           </div>
         </div>
@@ -86,6 +102,8 @@ export default function Layout({ children }: { children: ReactNode }) {
           </a>
         </div>
       </footer>
+
+      {exportOpen && <ExportModal onClose={() => setExportOpen(false)} />}
     </div>
   )
 }

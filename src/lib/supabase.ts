@@ -56,3 +56,33 @@ export async function fetchHistory(days: number): Promise<PriceSnapshot[]> {
     `price_snapshots?select=*&scraped_at=gte.${encodeURIComponent(since)}&order=scraped_at.asc`,
   )
 }
+
+const EXPORT_PAGE_SIZE = 1000
+// Safety cap so a runaway "all data" export can't page forever — well above
+// what the tracker will realistically accumulate for a long while.
+const EXPORT_MAX_ROWS = 100_000
+
+// Fetches every snapshot between two optional bounds (either end omitted
+// means unbounded), across every tracked ticker, paginating past PostgREST's
+// default row cap so a full-history export isn't silently truncated.
+export async function fetchSnapshotsInRange(
+  fromIso: string | null,
+  toIso: string | null,
+): Promise<PriceSnapshot[]> {
+  const filters: string[] = []
+  if (fromIso) filters.push(`scraped_at=gte.${encodeURIComponent(fromIso)}`)
+  if (toIso) filters.push(`scraped_at=lte.${encodeURIComponent(toIso)}`)
+  const filterQuery = filters.map((f) => `&${f}`).join('')
+
+  const rows: PriceSnapshot[] = []
+  let offset = 0
+  while (rows.length < EXPORT_MAX_ROWS) {
+    const page = await restGet<PriceSnapshot[]>(
+      `price_snapshots?select=*${filterQuery}&order=scraped_at.asc&limit=${EXPORT_PAGE_SIZE}&offset=${offset}`,
+    )
+    rows.push(...page)
+    if (page.length < EXPORT_PAGE_SIZE) break
+    offset += EXPORT_PAGE_SIZE
+  }
+  return rows
+}
