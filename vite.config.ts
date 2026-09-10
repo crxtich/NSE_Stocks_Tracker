@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// GitHub Pages serves this project from https://<user>.github.io/NSE_Stocks_Tracker/
-// so every asset URL must be prefixed with the repo name.
+// Served from the custom domain nse-tracker.is-a.dev (root path) rather than
+// the default https://<user>.github.io/NSE_Stocks_Tracker/ subpath — see
+// public/CNAME and the repo's Pages "Custom domain" setting.
 export default defineConfig({
   plugins: [react()],
-  base: '/NSE_Stocks_Tracker/',
+  base: '/',
 })

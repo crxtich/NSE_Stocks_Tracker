@@ -15,7 +15,7 @@ export function brandedPage(title: string, message: string, isError = false): Re
   <div style="max-width:420px;padding:32px;text-align:center;">
     <div style="color:${accent};font-size:20px;font-weight:700;margin-bottom:12px;">${title}</div>
     <p style="color:#8B93A1;font-size:15px;line-height:1.6;">${message}</p>
-    <a href="https://crxtich.github.io/NSE_Stocks_Tracker/" style="display:inline-block;margin-top:20px;color:#0B0D10;background:${accent};padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Back to the site</a>
+    <a href="https://nse-tracker.is-a.dev/" style="display:inline-block;margin-top:20px;color:#0B0D10;background:${accent};padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Back to the site</a>
   </div>
 </body>
 </html>`
