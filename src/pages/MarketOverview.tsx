@@ -3,6 +3,7 @@ import { useMarketData } from '../lib/MarketDataContext'
 import PriceTable, { type PriceRow } from '../components/PriceTable'
 import MoversList from '../components/MoversList'
 import UpdateCountdown from '../components/UpdateCountdown'
+import SubscribeForm from '../components/SubscribeForm'
 import { LoadingState, ErrorState, EmptyState } from '../components/StateViews'
 
 export default function MarketOverview() {
@@ -59,6 +60,7 @@ export default function MarketOverview() {
             <MoversList title="Top 5 Movers — Down" rows={losers} maxAbsChange={maxAbsChange} />
           </div>
           <PriceTable rows={rows} />
+          <SubscribeForm />
         </>
       )}
     </div>

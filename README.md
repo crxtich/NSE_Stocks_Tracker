@@ -105,6 +105,49 @@ prices every 30 minutes during NSE trading hours (Monday–Friday, 09:00–15:30
 them straight to the database. The frontend reads that data live on every page load — there's
 no separate rebuild step required to see new prices.
 
+## Email updates
+
+The site has a "Get occasional updates" subscribe form (Market Overview page) for personal
+notes — stocks being watched, what's been bought, things learned building the tracker. It's
+self-hosted: subscribers live in a `newsletter_subscribers` table (no RLS policies at all —
+everything goes through the Edge Functions below, using the service role key), and email
+sending goes through [Resend](https://resend.com)'s free tier.
+
+**One-time setup**, as Supabase Edge Function secrets:
+
+```bash
+supabase secrets set RESEND_API_KEY=re_your_resend_api_key
+supabase secrets set NEWSLETTER_ADMIN_SECRET=some-long-random-string-only-you-know
+# Optional, once a custom domain is verified in the Resend dashboard —
+# otherwise emails send from Resend's shared onboarding@resend.dev sandbox sender.
+supabase secrets set RESEND_FROM_EMAIL="NSE Market Intelligence <updates@yourdomain.com>"
+```
+
+Four Edge Functions handle the flow:
+
+| Function | Trigger | What it does |
+|---|---|---|
+| `subscribe-newsletter` | Fetch from the site's form | Validates the email, stores it unconfirmed, sends a confirmation email |
+| `confirm-subscription` | Link click, from the confirmation email | Marks the subscriber confirmed |
+| `unsubscribe` | Link click, in every update email's footer | Removes the subscriber |
+| `send-newsletter` | Manual — see below | Broadcasts an update to every confirmed subscriber |
+
+There's no admin UI for sending an update — invoke the function directly whenever there's
+something worth sharing:
+
+```bash
+curl -X POST 'https://lvtjtxtfminipebdwaxi.supabase.co/functions/v1/send-newsletter' \
+  -H 'x-admin-secret: <your NEWSLETTER_ADMIN_SECRET>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "subject": "This week: added EQTY to the watchlist",
+    "html": "<p>Picked up a small position in EQTY this week — here'\''s why...</p>"
+  }'
+```
+
+The `html` field is wrapped in the same branded template as the confirmation email, with a
+working unsubscribe link appended automatically — just write the update itself.
+
 ## Reading the data programmatically
 
 The database is a public, read-only Supabase REST API (PostgREST) — no scraping or headless
