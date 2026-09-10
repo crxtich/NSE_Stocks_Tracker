@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { X } from 'lucide-react'
 import { fetchSnapshotsInRange } from '../lib/supabase'
 import {
   buildCsv,
@@ -84,7 +85,7 @@ export default function ExportModal({ onClose }: { onClose: () => void }) {
         <div className="flex items-center justify-between">
           <h2 className="font-display text-lg font-semibold text-ink">Export data</h2>
           <button type="button" onClick={onClose} aria-label="Close" className="text-ink-faint transition-colors hover:text-ink">
-            ✕
+            <X className="h-4 w-4" strokeWidth={2} />
           </button>
         </div>
         <p className="mt-1 text-xs text-ink-muted">

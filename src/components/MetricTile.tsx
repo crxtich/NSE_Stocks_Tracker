@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Info } from 'lucide-react'
 import Tooltip from './Tooltip'
 
 export default function MetricTile({
@@ -22,11 +23,7 @@ export default function MetricTile({
           className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-ink-muted"
         >
           {label}
-          <svg viewBox="0 0 16 16" className="h-3 w-3 text-ink-faint" fill="none">
-            <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.3" />
-            <path d="M8 7.2v3.6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-            <circle cx="8" cy="5.1" r="0.9" fill="currentColor" />
-          </svg>
+          <Info className="h-3 w-3 text-ink-faint" strokeWidth={1.75} />
         </button>
       </Tooltip>
       <div className="mt-1.5 text-lg font-semibold tabular text-ink">{value}</div>

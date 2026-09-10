@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
+import { Download } from 'lucide-react'
 import MarketStatusBadge from './MarketStatusBadge'
 import ExportModal from './ExportModal'
 
@@ -47,10 +48,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               aria-label="Export data"
               className="flex items-center gap-1.5 rounded-md border border-canvas-border px-2 py-1 text-xs text-ink-muted transition-colors hover:border-accent/50 hover:text-accent"
             >
-              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 3v12m0 0-4-4m4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <Download className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
               <span className="hidden sm:inline">Export</span>
             </button>
             <MarketStatusBadge />

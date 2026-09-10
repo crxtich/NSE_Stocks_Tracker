@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import { useMarketData } from '../lib/MarketDataContext'
 import { rollingMovingAverage, METRIC_COPY } from '../lib/analysis'
 import PriceChart from '../components/PriceChart'
@@ -73,8 +74,9 @@ export default function StockDetail() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <Link to="/" className="text-xs text-ink-muted hover:text-ink">
-          ← Back to Market Overview
+        <Link to="/" className="inline-flex items-center gap-1 text-xs text-ink-muted hover:text-ink">
+          <ArrowLeft className="h-3.5 w-3.5" strokeWidth={2} />
+          Back to Market Overview
         </Link>
         <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ChevronDown } from 'lucide-react'
 import { useMarketData } from '../lib/MarketDataContext'
 import SignalScoreBadge from '../components/SignalScoreBadge'
 import ChangeValue from '../components/ChangeValue'
@@ -85,7 +86,10 @@ export default function TopPicks() {
           className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-ink"
         >
           How this ranking works
-          <span className="text-ink-faint">{showMethodology ? '−' : '+'}</span>
+          <ChevronDown
+            className={`h-4 w-4 text-ink-faint transition-transform ${showMethodology ? 'rotate-180' : ''}`}
+            strokeWidth={2}
+          />
         </button>
         {showMethodology && (
           <div className="space-y-3 border-t border-canvas-border px-4 py-4 text-sm leading-relaxed text-ink-muted">
