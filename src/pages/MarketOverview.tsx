@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useMarketData } from '../lib/MarketDataContext'
+import { usePageTitle } from '../hooks/usePageTitle'
 import PriceTable, { type PriceRow } from '../components/PriceTable'
 import MoversList from '../components/MoversList'
 import UpdateCountdown from '../components/UpdateCountdown'
@@ -7,6 +8,7 @@ import SubscribeForm from '../components/SubscribeForm'
 import { LoadingState, ErrorState, EmptyState } from '../components/StateViews'
 
 export default function MarketOverview() {
+  usePageTitle('Market Overview')
   const { loading, error, latestByTicker, lastUpdated } = useMarketData()
 
   const rows: PriceRow[] = useMemo(

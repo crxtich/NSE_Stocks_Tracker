@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useMarketData } from '../lib/MarketDataContext'
+import { usePageTitle } from '../hooks/usePageTitle'
 import SignalScoreBadge from '../components/SignalScoreBadge'
 import ChangeValue from '../components/ChangeValue'
 import Disclaimer from '../components/Disclaimer'
@@ -9,6 +10,7 @@ import { formatKsh } from '../lib/format'
 import { LoadingState, ErrorState, EmptyState } from '../components/StateViews'
 
 export default function Watchlist() {
+  usePageTitle('My Watchlist')
   const { loading, error, watchlist, getAnalysis } = useMarketData()
 
   const rows = useMemo(
