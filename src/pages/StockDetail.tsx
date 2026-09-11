@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { useMarketData } from '../lib/MarketDataContext'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { rollingMovingAverage, METRIC_COPY } from '../lib/analysis'
 import PriceChart from '../components/PriceChart'
 import VolumeChart from '../components/VolumeChart'
@@ -38,6 +39,7 @@ export default function StockDetail() {
 
   const analysis = getAnalysis(ticker.toUpperCase())
   const latest = latestByTicker.get(ticker.toUpperCase())
+  usePageTitle(analysis ? `${analysis.companyName} (${analysis.ticker})` : ticker.toUpperCase())
 
   const chartData = useMemo(() => {
     if (!analysis) return { price: [], volume: [] }

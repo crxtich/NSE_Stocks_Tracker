@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown } from 'lucide-react'
 import { useMarketData } from '../lib/MarketDataContext'
+import { usePageTitle } from '../hooks/usePageTitle'
 import SignalScoreBadge from '../components/SignalScoreBadge'
 import ChangeValue from '../components/ChangeValue'
 import Disclaimer from '../components/Disclaimer'
@@ -10,6 +11,7 @@ import { formatKsh } from '../lib/format'
 import { LoadingState, ErrorState, EmptyState } from '../components/StateViews'
 
 export default function TopPicks() {
+  usePageTitle('Top 10 Picks')
   const { loading, error, analyses } = useMarketData()
   const [showMethodology, setShowMethodology] = useState(false)
 

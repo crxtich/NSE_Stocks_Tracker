@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This app is a client-side SPA using HashRouter (routes live at /#/top-picks,
+  /#/watchlist, etc.). Fragment identifiers aren't sent to the server and
+  most crawlers — Google included — don't treat them as distinct indexable
+  URLs, so only the root entry below is reliably crawlable. The hash routes
+  are still listed in case a crawler follows internal links to them, but
+  don't expect them to rank as separate pages while HashRouter is in use;
+  that would need BrowserRouter + a server/host rewrite instead.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://nse-tracker.is-a.dev/</loc>
+    <changefreq>hourly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://nse-tracker.is-a.dev/#/top-picks</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nse-tracker.is-a.dev/#/watchlist</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.6</priority>
+  </url>
+</urlset>
