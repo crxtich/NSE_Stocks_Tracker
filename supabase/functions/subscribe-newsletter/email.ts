@@ -1,7 +1,7 @@
 // Thin wrapper around the Resend API plus a branded HTML shell every
 // newsletter-related email uses, so the confirmation email and the actual
 // updates look like they come from the same place as the site.
-const SITE_URL = 'https://nse-tracker.is-a.dev/'
+const SITE_URL = 'https://crxtich.github.io/NSE_Stocks_Tracker/'
 const AUTHOR_URL = 'https://www.linkedin.com/in/crotich/'
 
 // Resend's shared sandbox sender — works without verifying a custom domain,
