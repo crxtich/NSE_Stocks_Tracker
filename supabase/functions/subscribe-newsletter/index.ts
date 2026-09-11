@@ -14,7 +14,7 @@
 
 import { corsHeaders } from './cors.ts'
 import { getServiceClient } from './supabase.ts'
-import { sendEmail, wrapEmailHtml } from './email.ts'
+import { sendEmail, wrapEmailHtml, OWNER_EMAIL } from './email.ts'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -83,6 +83,19 @@ Deno.serve(async (req) => {
       )
     } catch (err) {
       console.error('subscribe-newsletter: welcome email failed (subscriber is still saved):', err)
+    }
+
+    // Best-effort notification to the site owner — same non-blocking
+    // pattern as the welcome email above, since there's no admin UI to
+    // otherwise see new signups as they happen.
+    try {
+      await sendEmail(
+        OWNER_EMAIL,
+        `New subscriber: ${normalized}`,
+        wrapEmailHtml(`<p>${normalized} just subscribed to NSE Market Intelligence updates.</p>`),
+      )
+    } catch (err) {
+      console.error('subscribe-newsletter: owner notification failed:', err)
     }
 
     return Response.json({ status: 'ok', message: "You're subscribed — thanks!" }, { headers: corsHeaders })
