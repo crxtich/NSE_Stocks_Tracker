@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import type { SignalBand } from '../lib/analysis'
 
 const BAND_STYLES: Record<SignalBand, { text: string; bg: string; ring: string; label: string }> = {
-  strong: { text: 'text-gain', bg: 'bg-gain-soft', ring: 'ring-gain/30', label: 'Strong Signal' },
-  moderate: { text: 'text-accent', bg: 'bg-accent-soft', ring: 'ring-accent/30', label: 'Moderate Signal' },
+  strong: { text: 'text-gain', bg: 'bg-gain/10', ring: 'ring-gain/30', label: 'Strong Signal' },
+  moderate: { text: 'text-accent', bg: 'bg-accent/10', ring: 'ring-accent/30', label: 'Moderate Signal' },
   neutral: { text: 'text-ink-muted', bg: 'bg-canvas-raised', ring: 'ring-canvas-border', label: 'Neutral' },
-  weak: { text: 'text-loss', bg: 'bg-loss-soft', ring: 'ring-loss/30', label: 'Weak Signal' },
+  weak: { text: 'text-loss', bg: 'bg-loss/10', ring: 'ring-loss/30', label: 'Weak Signal' },
 }
 
 /** Animates a number counting up from 0 on mount — the one entrance animation in the app. */

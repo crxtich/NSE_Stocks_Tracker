@@ -1,5 +1,15 @@
 import type { Config } from 'tailwindcss'
 
+// Colors resolve to CSS custom properties (defined per-theme in src/index.css
+// as "R G B" triplets) rather than fixed hex values, so every existing
+// bg-canvas/text-ink/etc. utility automatically repaints for light vs dark —
+// no dark: variants needed anywhere in the component tree. The
+// rgb(var(...) / <alpha-value>) wrapper keeps Tailwind's opacity modifiers
+// (e.g. bg-accent/10) working the same way they would with a plain hex color.
+function withOpacity(variable: string) {
+  return `rgb(var(${variable}) / <alpha-value>)`
+}
+
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   darkMode: 'class',
@@ -10,28 +20,29 @@ export default {
         // built-in font-size scale, which already defines a "base" key (1rem) —
         // that collision makes `text-base` ambiguous between color and font-size.
         canvas: {
-          DEFAULT: '#0B0D10',
-          raised: '#12151A',
-          panel: '#161A20',
-          border: '#242A32',
+          DEFAULT: withOpacity('--color-canvas'),
+          raised: withOpacity('--color-canvas-raised'),
+          panel: withOpacity('--color-canvas-panel'),
+          border: withOpacity('--color-canvas-border'),
         },
         ink: {
-          DEFAULT: '#F5F7FA',
-          muted: '#8B93A1',
-          faint: '#565E6B',
+          DEFAULT: withOpacity('--color-ink'),
+          muted: withOpacity('--color-ink-muted'),
+          faint: withOpacity('--color-ink-faint'),
         },
         accent: {
-          DEFAULT: '#F0A93A',
-          soft: '#F0A93A1A',
-          bright: '#FFC266',
+          DEFAULT: withOpacity('--color-accent'),
+          bright: withOpacity('--color-accent-bright'),
+          // Fixed, not theme-variable: text sitting on a bg-accent button/chip
+          // needs to stay dark regardless of the overall theme, since the
+          // accent color itself is bright in both light and dark mode.
+          ink: '#0B0D10',
         },
         gain: {
-          DEFAULT: '#2FBF71',
-          soft: '#2FBF711A',
+          DEFAULT: withOpacity('--color-gain'),
         },
         loss: {
-          DEFAULT: '#E4574C',
-          soft: '#E4574C1A',
+          DEFAULT: withOpacity('--color-loss'),
         },
       },
       fontFamily: {

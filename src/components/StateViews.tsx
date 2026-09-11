@@ -9,7 +9,7 @@ export function LoadingState({ label = 'Loading market data…' }: { label?: str
 
 export function ErrorState({ message }: { message: string }) {
   return (
-    <div className="rounded-lg border border-loss/30 bg-loss-soft px-5 py-6 text-sm text-loss">
+    <div className="rounded-lg border border-loss/30 bg-loss/10 px-5 py-6 text-sm text-loss">
       <p className="font-medium">Couldn't load market data</p>
       <p className="mt-1 text-loss/80">{message}</p>
     </div>

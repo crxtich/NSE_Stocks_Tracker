@@ -75,7 +75,7 @@ export default function SubscribeForm() {
           <button
             type="submit"
             disabled={status === 'loading'}
-            className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-canvas transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-ink transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
           >
             {status === 'loading' ? 'Sending…' : 'Subscribe'}
           </button>

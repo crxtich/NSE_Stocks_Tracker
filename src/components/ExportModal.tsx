@@ -102,7 +102,7 @@ export default function ExportModal({ onClose }: { onClose: () => void }) {
                   type="button"
                   onClick={() => setMode(m)}
                   className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-medium transition-colors ${
-                    mode === m ? 'border-accent bg-accent-soft text-accent' : 'border-canvas-border text-ink-muted hover:text-ink'
+                    mode === m ? 'border-accent bg-accent/10 text-accent' : 'border-canvas-border text-ink-muted hover:text-ink'
                   }`}
                 >
                   {MODE_LABELS[m]}
@@ -120,7 +120,7 @@ export default function ExportModal({ onClose }: { onClose: () => void }) {
                   onClick={() => setFixedDays(p.days)}
                   className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
                     fixedDays === p.days
-                      ? 'border-accent bg-accent-soft text-accent'
+                      ? 'border-accent bg-accent/10 text-accent'
                       : 'border-canvas-border text-ink-muted hover:text-ink'
                   }`}
                 >
@@ -139,7 +139,7 @@ export default function ExportModal({ onClose }: { onClose: () => void }) {
                   value={customFrom}
                   max={customTo || today}
                   onChange={(e) => setCustomFrom(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-canvas-border bg-canvas px-2 py-1.5 text-sm text-ink [color-scheme:dark]"
+                  className="mt-1 w-full rounded-md border border-canvas-border bg-canvas px-2 py-1.5 text-sm text-ink"
                 />
               </label>
               <label className="flex-1 text-xs text-ink-muted">
@@ -150,7 +150,7 @@ export default function ExportModal({ onClose }: { onClose: () => void }) {
                   min={customFrom || undefined}
                   max={today}
                   onChange={(e) => setCustomTo(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-canvas-border bg-canvas px-2 py-1.5 text-sm text-ink [color-scheme:dark]"
+                  className="mt-1 w-full rounded-md border border-canvas-border bg-canvas px-2 py-1.5 text-sm text-ink"
                 />
               </label>
             </div>
@@ -169,7 +169,7 @@ export default function ExportModal({ onClose }: { onClose: () => void }) {
                   type="button"
                   onClick={() => setFormat(f)}
                   className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-medium transition-colors ${
-                    format === f ? 'border-accent bg-accent-soft text-accent' : 'border-canvas-border text-ink-muted hover:text-ink'
+                    format === f ? 'border-accent bg-accent/10 text-accent' : 'border-canvas-border text-ink-muted hover:text-ink'
                   }`}
                 >
                   {f === 'csv' ? 'CSV' : 'Excel (.xlsx)'}
@@ -185,7 +185,7 @@ export default function ExportModal({ onClose }: { onClose: () => void }) {
           type="button"
           disabled={!canExport || status === 'loading'}
           onClick={handleExport}
-          className="mt-5 w-full rounded-md bg-accent px-4 py-2 text-sm font-semibold text-canvas transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-5 w-full rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-ink transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
         >
           {status === 'loading' ? 'Preparing export…' : 'Export'}
         </button>

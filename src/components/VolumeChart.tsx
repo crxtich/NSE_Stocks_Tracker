@@ -49,11 +49,11 @@ export default function VolumeChart({ data }: { data: VolumePoint[] }) {
         onMouseMove={handleMove}
         onMouseLeave={() => setHoverIdx(null)}
       >
-        <line x1={PAD_LEFT} x2={WIDTH - PAD_RIGHT} y1={PAD_TOP + PLOT_H} y2={PAD_TOP + PLOT_H} stroke="#242A32" strokeWidth={1} />
-        <text x={PAD_LEFT - 6} y={PAD_TOP + PLOT_H} textAnchor="end" dominantBaseline="middle" fontSize={10} fill="#565E6B">
+        <line x1={PAD_LEFT} x2={WIDTH - PAD_RIGHT} y1={PAD_TOP + PLOT_H} y2={PAD_TOP + PLOT_H} className="stroke-canvas-border" strokeWidth={1} />
+        <text x={PAD_LEFT - 6} y={PAD_TOP + PLOT_H} textAnchor="end" dominantBaseline="middle" fontSize={10} className="fill-ink-faint">
           0
         </text>
-        <text x={PAD_LEFT - 6} y={PAD_TOP + 4} textAnchor="end" dominantBaseline="middle" fontSize={10} fill="#565E6B">
+        <text x={PAD_LEFT - 6} y={PAD_TOP + 4} textAnchor="end" dominantBaseline="middle" fontSize={10} className="fill-ink-faint">
           {formatCompactVolume(maxV)}
         </text>
 
@@ -65,7 +65,7 @@ export default function VolumeChart({ data }: { data: VolumePoint[] }) {
             width={barW}
             height={Math.max(0, heightAt(d.volume ?? 0))}
             rx={1.5}
-            fill={hoverIdx === i ? '#F0A93A' : '#8B93A1'}
+            className={hoverIdx === i ? 'fill-accent' : 'fill-ink-muted'}
           />
         ))}
       </svg>

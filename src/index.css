@@ -3,7 +3,47 @@
 @tailwind utilities;
 
 @layer base {
-  html {
+  /* Light palette (default). Values are "R G B" triplets, not hex, so
+     tailwind.config.ts can wrap them in rgb(... / <alpha-value>) and keep
+     opacity modifiers (bg-accent/10) working. Accent/gain/loss are darkened
+     relative to their dark-mode versions below — the bright, high-luminance
+     versions read fine on a near-black page but fail contrast on a light one
+     when used as text/border color rather than a button fill. */
+  :root {
+    --color-canvas: 247 248 250;
+    --color-canvas-raised: 255 255 255;
+    --color-canvas-panel: 255 255 255;
+    --color-canvas-border: 227 230 235;
+
+    --color-ink: 18 21 26;
+    --color-ink-muted: 91 100 114;
+    --color-ink-faint: 139 147 161;
+
+    --color-accent: 181 121 30;
+    --color-accent-bright: 240 169 58;
+
+    --color-gain: 30 158 90;
+    --color-loss: 196 61 49;
+
+    color-scheme: light;
+  }
+
+  .dark {
+    --color-canvas: 11 13 16;
+    --color-canvas-raised: 18 21 26;
+    --color-canvas-panel: 22 26 32;
+    --color-canvas-border: 36 42 50;
+
+    --color-ink: 245 247 250;
+    --color-ink-muted: 139 147 161;
+    --color-ink-faint: 86 94 107;
+
+    --color-accent: 240 169 58;
+    --color-accent-bright: 255 194 102;
+
+    --color-gain: 47 191 113;
+    --color-loss: 228 87 76;
+
     color-scheme: dark;
   }
 
@@ -12,8 +52,8 @@
   }
 
   ::selection {
-    background: theme('colors.accent.DEFAULT');
-    color: theme('colors.canvas.DEFAULT');
+    background: rgb(var(--color-accent));
+    color: rgb(var(--color-canvas));
   }
 
   ::-webkit-scrollbar {
@@ -24,7 +64,7 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: theme('colors.canvas.border');
+    background: rgb(var(--color-canvas-border));
     border-radius: 999px;
   }
 }

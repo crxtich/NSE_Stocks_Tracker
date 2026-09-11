@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { Download } from 'lucide-react'
 import MarketStatusBadge from './MarketStatusBadge'
 import ExportModal from './ExportModal'
+import ThemeToggle from './ThemeToggle'
 
 const NAV_ITEMS = [
   { to: '/', label: 'Market Overview', end: true },
@@ -51,6 +52,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               <Download className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
               <span className="hidden sm:inline">Export</span>
             </button>
+            <ThemeToggle />
             <MarketStatusBadge />
           </div>
         </div>

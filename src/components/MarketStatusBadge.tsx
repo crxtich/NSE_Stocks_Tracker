@@ -13,7 +13,7 @@ export default function MarketStatusBadge() {
     <span
       className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${
         open
-          ? 'border-gain/30 bg-gain-soft text-gain'
+          ? 'border-gain/30 bg-gain/10 text-gain'
           : 'border-canvas-border bg-canvas-panel text-ink-muted'
       }`}
     >

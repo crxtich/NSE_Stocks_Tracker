@@ -105,7 +105,7 @@ export default function StockDetail() {
                 key={opt}
                 onClick={() => setRange(opt)}
                 className={`rounded px-2.5 py-1 font-medium transition-colors ${
-                  range === opt ? 'bg-accent text-canvas' : 'text-ink-muted hover:text-ink'
+                  range === opt ? 'bg-accent text-accent-ink' : 'text-ink-muted hover:text-ink'
                 }`}
               >
                 {opt}D

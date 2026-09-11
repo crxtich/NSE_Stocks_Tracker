@@ -7,7 +7,7 @@ export default function Disclaimer({ variant = 'default' }: { variant?: 'default
     )
   }
   return (
-    <div className="rounded-lg border border-accent/20 bg-accent-soft px-4 py-3 text-sm text-ink-muted">
+    <div className="rounded-lg border border-accent/20 bg-accent/10 px-4 py-3 text-sm text-ink-muted">
       <span className="font-medium text-accent">Not financial advice.</span> These scores are
       mathematical signals derived entirely from historical price and trading-volume data — not
       company news, management quality, or macroeconomic outlook. They are not a recommendation

@@ -1,6 +1,23 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
+    <!-- Runs before first paint so there's no flash of the wrong theme: reads
+         the saved preference (or falls back to OS preference), applies the
+         `dark` class synchronously (the same class ThemeToggle manages
+         later), and sets the mobile browser-chrome color to match. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme')
+          var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+          if (dark) document.documentElement.classList.add('dark')
+          document.addEventListener('DOMContentLoaded', function () {
+            var meta = document.querySelector('meta[name="theme-color"]')
+            if (meta) meta.setAttribute('content', dark ? '#0B0D10' : '#F7F8FA')
+          })
+        } catch (e) {}
+      })()
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

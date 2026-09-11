@@ -84,31 +84,31 @@ export default function PriceChart({ data }: { data: PricePoint[] }) {
       >
         <defs>
           <linearGradient id="priceFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#F0A93A" stopOpacity={0.25} />
-            <stop offset="100%" stopColor="#F0A93A" stopOpacity={0} />
+            <stop offset="0%" style={{ stopColor: 'rgb(var(--color-accent))' }} stopOpacity={0.25} />
+            <stop offset="100%" style={{ stopColor: 'rgb(var(--color-accent))' }} stopOpacity={0} />
           </linearGradient>
         </defs>
 
         {yTicks.map((t) => (
           <g key={t}>
-            <line x1={PAD_LEFT} x2={WIDTH - PAD_RIGHT} y1={yAt(t)} y2={yAt(t)} stroke="#242A32" strokeWidth={1} />
-            <text x={PAD_LEFT - 6} y={yAt(t)} textAnchor="end" dominantBaseline="middle" fontSize={10} fill="#565E6B">
+            <line x1={PAD_LEFT} x2={WIDTH - PAD_RIGHT} y1={yAt(t)} y2={yAt(t)} className="stroke-canvas-border" strokeWidth={1} />
+            <text x={PAD_LEFT - 6} y={yAt(t)} textAnchor="end" dominantBaseline="middle" fontSize={10} className="fill-ink-faint">
               {t.toLocaleString('en-KE', { maximumFractionDigits: 0 })}
             </text>
           </g>
         ))}
 
         {xLabelIdxs.map((i) => (
-          <text key={data[i].date} x={xAt(i)} y={HEIGHT - 6} textAnchor="middle" fontSize={10} fill="#565E6B">
+          <text key={data[i].date} x={xAt(i)} y={HEIGHT - 6} textAnchor="middle" fontSize={10} className="fill-ink-faint">
             {data[i].date}
           </text>
         ))}
 
         <path d={areaPath} fill="url(#priceFill)" stroke="none" />
         {maSegments.map((seg, i) => (
-          <path key={i} d={seg} fill="none" stroke="#8B93A1" strokeWidth={1.5} strokeDasharray="4 3" />
+          <path key={i} d={seg} fill="none" className="stroke-ink-muted" strokeWidth={1.5} strokeDasharray="4 3" />
         ))}
-        <path d={pricePath} fill="none" stroke="#F0A93A" strokeWidth={2} />
+        <path d={pricePath} fill="none" className="stroke-accent" strokeWidth={2} />
 
         {hoverIdx !== null && (
           <>
@@ -117,11 +117,11 @@ export default function PriceChart({ data }: { data: PricePoint[] }) {
               x2={xAt(hoverIdx)}
               y1={PAD_TOP}
               y2={PAD_TOP + PLOT_H}
-              stroke="#8B93A1"
+              className="stroke-ink-muted"
               strokeWidth={1}
               strokeDasharray="3 3"
             />
-            <circle cx={xAt(hoverIdx)} cy={yAt(data[hoverIdx].price)} r={3.5} fill="#F0A93A" />
+            <circle cx={xAt(hoverIdx)} cy={yAt(data[hoverIdx].price)} r={3.5} className="fill-accent" />
           </>
         )}
       </svg>

@@ -11,7 +11,7 @@ export default function DataMaturityNotice() {
   if (daysOfHistory >= SIGNAL_WINDOW_DAYS) return null
 
   return (
-    <div className="rounded-lg border border-accent/30 bg-accent-soft px-4 py-3 text-sm leading-relaxed text-ink">
+    <div className="rounded-lg border border-accent/30 bg-accent/10 px-4 py-3 text-sm leading-relaxed text-ink">
       <span className="font-semibold text-accent">Scores are still stabilizing.</span> Trend and
       Volume Confirmation each need at least {SIGNAL_WINDOW_DAYS} trading days of price history and
       default to a neutral midpoint until then. The tracker has collected{' '}
