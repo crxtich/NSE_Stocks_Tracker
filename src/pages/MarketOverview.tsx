@@ -43,6 +43,8 @@ export default function MarketOverview() {
         <UpdateCountdown lastUpdated={lastUpdated} />
       </div>
 
+      <SubscribeForm />
+
       {loading && rows.length === 0 && <LoadingState />}
       {error && <ErrorState message={error} />}
 
@@ -60,7 +62,6 @@ export default function MarketOverview() {
             <MoversList title="Top 5 Movers — Down" rows={losers} maxAbsChange={maxAbsChange} />
           </div>
           <PriceTable rows={rows} />
-          <SubscribeForm />
         </>
       )}
     </div>
