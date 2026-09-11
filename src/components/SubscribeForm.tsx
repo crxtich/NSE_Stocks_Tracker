@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { Mail } from 'lucide-react'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -36,7 +37,9 @@ export default function SubscribeForm() {
   return (
     <div className="rounded-lg border border-canvas-border bg-canvas-panel p-5">
       <div className="flex items-center gap-2">
-        <span aria-hidden className="text-lg">📬</span>
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-accent/10 text-accent">
+          <Mail className="h-3.5 w-3.5" strokeWidth={2} />
+        </span>
         <h2 className="font-display text-base font-semibold text-ink">Get occasional updates</h2>
       </div>
       <p className="mt-1.5 max-w-lg text-sm text-ink-muted">
