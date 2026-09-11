@@ -10,7 +10,7 @@ export interface ExportRange {
   customTo?: string // yyyy-mm-dd
 }
 
-const SITE_URL = 'https://crxtich.github.io/NSE_Stocks_Tracker/'
+const SITE_URL = 'https://nse-tracker.crotich.com/'
 const AUTHOR_URL = 'https://www.linkedin.com/in/crotich/'
 
 const BRAND_LINES = [

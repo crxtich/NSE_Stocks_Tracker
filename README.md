@@ -6,7 +6,7 @@ quantitative signals — momentum, trend, stability, and a single composite scor
 without relying on news, analyst opinions, or company fundamentals. It's built to be read by
 anyone, not just finance professionals.
 
-**Live site:** [crxtich.github.io/NSE_Stocks_Tracker](https://crxtich.github.io/NSE_Stocks_Tracker/)
+**Live site:** [nse-tracker.crotich.com](https://nse-tracker.crotich.com/)
 
 ## Tech stack
 

@@ -10,17 +10,17 @@
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://crxtich.github.io/NSE_Stocks_Tracker/</loc>
+    <loc>https://nse-tracker.crotich.com/</loc>
     <changefreq>hourly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://crxtich.github.io/NSE_Stocks_Tracker/#/top-picks</loc>
+    <loc>https://nse-tracker.crotich.com/#/top-picks</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://crxtich.github.io/NSE_Stocks_Tracker/#/watchlist</loc>
+    <loc>https://nse-tracker.crotich.com/#/watchlist</loc>
     <changefreq>hourly</changefreq>
     <priority>0.6</priority>
   </url>

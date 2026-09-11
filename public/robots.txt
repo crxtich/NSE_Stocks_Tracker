@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://crxtich.github.io/NSE_Stocks_Tracker/sitemap.xml
+Sitemap: https://nse-tracker.crotich.com/sitemap.xml
