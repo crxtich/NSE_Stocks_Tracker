@@ -4,6 +4,10 @@
 const SITE_URL = 'https://nse-tracker.crotich.com/'
 const AUTHOR_URL = 'https://www.linkedin.com/in/crotich/'
 
+// Where new-subscriber notifications go — the site has no admin UI, so this
+// is the only way the owner finds out someone signed up.
+export const OWNER_EMAIL = 'rotich.collins96@gmail.com'
+
 // Resend's shared sandbox sender — works without verifying a custom domain,
 // but for real deliverability set a RESEND_FROM_EMAIL secret once a domain
 // is verified in the Resend dashboard.

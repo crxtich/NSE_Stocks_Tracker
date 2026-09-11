@@ -44,6 +44,14 @@ export interface WatchlistEntry {
   added_at: string
 }
 
+// Reads from a view that exposes only the aggregate count, never individual
+// rows — newsletter_subscribers itself has no RLS policies granting the
+// anon key any access at all (see supabase/migrations/004_newsletter_subscriber_count.sql).
+export async function fetchSubscriberCount(): Promise<number> {
+  const rows = await restGet<{ count: number }[]>('newsletter_subscriber_count?select=count')
+  return rows[0]?.count ?? 0
+}
+
 export async function fetchWatchlist(): Promise<WatchlistEntry[]> {
   return restGet<WatchlistEntry[]>('watchlist?select=*&order=ticker')
 }

@@ -6,6 +6,7 @@
 
 import { getServiceClient } from './supabase.ts'
 import { brandedPage } from './page.ts'
+import { sendEmail, wrapEmailHtml, OWNER_EMAIL } from './email.ts'
 
 Deno.serve(async (req) => {
   try {
@@ -15,7 +16,7 @@ Deno.serve(async (req) => {
     const supabase = getServiceClient()
     const { data, error } = await supabase
       .from('newsletter_subscribers')
-      .select('id, confirmed')
+      .select('id, email, confirmed')
       .eq('confirm_token', token)
       .maybeSingle()
     if (error) throw new Error(error.message)
@@ -30,6 +31,31 @@ Deno.serve(async (req) => {
         .update({ confirmed: true, confirmed_at: new Date().toISOString() })
         .eq('id', data.id)
       if (updateError) throw new Error(updateError.message)
+
+      // Best-effort — the subscriber is already confirmed above, so a
+      // delivery failure here must not turn into an error page for someone
+      // who just successfully confirmed.
+      try {
+        await sendEmail(
+          data.email,
+          "You're subscribed — NSE Market Intelligence",
+          wrapEmailHtml(
+            "<p>Thanks for confirming! You'll get occasional emails on stocks I'm watching, what I've bought this week, and things I've learned building this tracker — never on a fixed schedule.</p>",
+          ),
+        )
+      } catch (err) {
+        console.error('confirm-subscription: welcome email failed:', err)
+      }
+
+      try {
+        await sendEmail(
+          OWNER_EMAIL,
+          `New subscriber: ${data.email}`,
+          wrapEmailHtml(`<p>${data.email} just confirmed their subscription to NSE Market Intelligence updates.</p>`),
+        )
+      } catch (err) {
+        console.error('confirm-subscription: owner notification failed:', err)
+      }
     }
 
     return brandedPage(

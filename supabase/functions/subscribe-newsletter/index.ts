@@ -2,20 +2,17 @@
 //
 // Called directly from the site's Subscribe form (Authorization: Bearer
 // <anon key>, same key already public in the frontend bundle). Validates
-// the email and stores it.
-//
-// TEMPORARILY auto-confirms on signup instead of the usual double opt-in
-// (click a link in a confirmation email): Resend's shared sandbox sender
-// can only deliver to the account's own verified address until a real
-// domain is verified at resend.com/domains, so a confirmation link can't
-// reach anyone else yet. Revert to gating on a clicked link (see
-// confirm-subscription, still deployed and unchanged) once RESEND_FROM_EMAIL
-// points at a verified domain.
+// the email, stores it unconfirmed, and sends a confirmation email via
+// Resend — a real subscription only exists once that link is clicked
+// (confirm-subscription), so an address someone else submits without their
+// consent never actually gets added to the list.
 
 import { corsHeaders } from './cors.ts'
 import { getServiceClient } from './supabase.ts'
-import { sendEmail, wrapEmailHtml, OWNER_EMAIL } from './email.ts'
+import { sendEmail, wrapEmailHtml } from './email.ts'
 
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+const FUNCTIONS_BASE = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1` : ''
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 Deno.serve(async (req) => {
@@ -52,53 +49,40 @@ Deno.serve(async (req) => {
       )
     }
 
+    const confirmToken = crypto.randomUUID()
+
     if (existing) {
       const { error } = await supabase
         .from('newsletter_subscribers')
-        .update({ confirmed: true, confirmed_at: new Date().toISOString() })
+        .update({ confirm_token: confirmToken })
         .eq('id', existing.id)
       if (error) throw new Error(error.message)
     } else {
       const { error } = await supabase.from('newsletter_subscribers').insert({
         email: normalized,
-        confirmed: true,
-        confirmed_at: new Date().toISOString(),
-        confirm_token: crypto.randomUUID(),
+        confirm_token: confirmToken,
         unsubscribe_token: crypto.randomUUID(),
       })
       if (error) throw new Error(error.message)
     }
 
-    // Best-effort welcome email — the subscriber is already stored and
-    // confirmed above, so a delivery failure here (e.g. Resend's sandbox
-    // sender rejecting a non-owner recipient) must not surface as a
-    // signup failure to the person who just subscribed.
-    try {
-      await sendEmail(
-        normalized,
-        "You're subscribed — NSE Market Intelligence",
-        wrapEmailHtml(
-          "<p>Thanks for subscribing! You'll get occasional emails on stocks I'm watching, what I've bought this week, and things I've learned building this tracker — never on a fixed schedule.</p>",
-        ),
-      )
-    } catch (err) {
-      console.error('subscribe-newsletter: welcome email failed (subscriber is still saved):', err)
-    }
+    const confirmUrl = `${FUNCTIONS_BASE}/confirm-subscription?token=${confirmToken}`
+    await sendEmail(
+      normalized,
+      'Confirm your subscription — NSE Market Intelligence',
+      wrapEmailHtml(`
+        <p>One more step — confirm you'd like occasional updates on stocks I'm watching, what I've bought this week, and things I've learned building this tracker.</p>
+        <p style="text-align:center;margin:28px 0;">
+          <a href="${confirmUrl}" style="display:inline-block;background:#F0A93A;color:#0B0D10;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">Confirm subscription</a>
+        </p>
+        <p style="color:#565E6B;font-size:13px;">Didn't request this? Just ignore this email — you won't be subscribed unless you click the button above.</p>
+      `),
+    )
 
-    // Best-effort notification to the site owner — same non-blocking
-    // pattern as the welcome email above, since there's no admin UI to
-    // otherwise see new signups as they happen.
-    try {
-      await sendEmail(
-        OWNER_EMAIL,
-        `New subscriber: ${normalized}`,
-        wrapEmailHtml(`<p>${normalized} just subscribed to NSE Market Intelligence updates.</p>`),
-      )
-    } catch (err) {
-      console.error('subscribe-newsletter: owner notification failed:', err)
-    }
-
-    return Response.json({ status: 'ok', message: "You're subscribed — thanks!" }, { headers: corsHeaders })
+    return Response.json(
+      { status: 'ok', message: 'Check your inbox to confirm your subscription.' },
+      { headers: corsHeaders },
+    )
   } catch (err) {
     console.error('subscribe-newsletter failed:', err)
     return Response.json(

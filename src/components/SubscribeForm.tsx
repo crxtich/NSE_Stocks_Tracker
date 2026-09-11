@@ -1,5 +1,6 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Mail } from 'lucide-react'
+import { fetchSubscriberCount } from '../lib/supabase'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -9,6 +10,13 @@ export default function SubscribeForm() {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [message, setMessage] = useState('')
+  const [subscriberCount, setSubscriberCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    fetchSubscriberCount()
+      .then(setSubscriberCount)
+      .catch(() => {}) // purely decorative — a failed fetch just hides the count
+  }, [])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -46,6 +54,11 @@ export default function SubscribeForm() {
         Stocks I'm watching, what I've bought this week, and things I've learned building this
         tracker — sent whenever there's something worth sharing, never on a fixed schedule.
       </p>
+      {!!subscriberCount && (
+        <p className="mt-1.5 text-xs text-ink-faint">
+          Join {subscriberCount} {subscriberCount === 1 ? 'person' : 'people'} already getting updates.
+        </p>
+      )}
 
       {status === 'done' ? (
         <p className="mt-4 text-sm font-medium text-gain">{message}</p>
