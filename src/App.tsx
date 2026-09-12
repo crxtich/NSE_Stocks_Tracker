@@ -5,6 +5,7 @@ import MarketOverview from './pages/MarketOverview'
 import TopPicks from './pages/TopPicks'
 import Watchlist from './pages/Watchlist'
 import StockDetail from './pages/StockDetail'
+import SubscriptionStatus from './pages/SubscriptionStatus'
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
           <Route path="/top-picks" element={<TopPicks />} />
           <Route path="/watchlist" element={<Watchlist />} />
           <Route path="/stock/:ticker" element={<StockDetail />} />
+          <Route path="/subscription-status" element={<SubscriptionStatus />} />
         </Routes>
       </Layout>
     </MarketDataProvider>

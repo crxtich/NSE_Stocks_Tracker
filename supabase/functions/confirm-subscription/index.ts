@@ -3,15 +3,26 @@
 // The link clicked from the confirmation email. A plain GET navigation from
 // the browser — no Authorization header — so this function is deployed with
 // verify_jwt disabled and authenticates purely via the single-use token.
+//
+// Redirects to the site's own /subscription-status page rather than
+// rendering HTML directly: Supabase's Edge Function gateway was observed
+// overriding an explicitly-set `Content-Type: text/html` down to
+// `text/plain`, so a browser hitting this function showed raw markup as
+// text instead of a rendered page. A redirect response has no such issue.
 
 import { getServiceClient } from './supabase.ts'
-import { brandedPage } from './page.ts'
 import { sendEmail, wrapEmailHtml, OWNER_EMAIL } from './email.ts'
+
+const SITE_URL = 'https://nse-tracker.crotich.com'
+
+function redirectTo(status: string): Response {
+  return Response.redirect(`${SITE_URL}/#/subscription-status?status=${status}`, 302)
+}
 
 Deno.serve(async (req) => {
   try {
     const token = new URL(req.url).searchParams.get('token')
-    if (!token) return brandedPage('Missing token', 'This confirmation link is incomplete.', true)
+    if (!token) return redirectTo('missing-token')
 
     const supabase = getServiceClient()
     const { data, error } = await supabase
@@ -21,9 +32,7 @@ Deno.serve(async (req) => {
       .maybeSingle()
     if (error) throw new Error(error.message)
 
-    if (!data) {
-      return brandedPage('Link not found', 'This confirmation link is invalid — it may have already been used.', true)
-    }
+    if (!data) return redirectTo('invalid-token')
 
     if (!data.confirmed) {
       const { error: updateError } = await supabase
@@ -58,12 +67,9 @@ Deno.serve(async (req) => {
       }
     }
 
-    return brandedPage(
-      "You're subscribed!",
-      "You'll get occasional emails on stocks I'm watching, what I've bought, and things I've learned — never more than there's something worth sharing.",
-    )
+    return redirectTo('confirmed')
   } catch (err) {
     console.error('confirm-subscription failed:', err)
-    return brandedPage('Something went wrong', 'Please try again shortly.', true)
+    return redirectTo('error')
   }
 })
