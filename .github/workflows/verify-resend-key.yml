@@ -1,0 +1,50 @@
+# Read-only check: confirms the RESEND_API_KEY currently installed on the
+# server is actually valid, by calling Resend's API with it directly. Sends
+# no email, writes nothing. The key itself is read server-side and never
+# printed or sent back — only the resulting HTTP status code is reported.
+name: Verify Resend API key (read-only)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up SSH key
+        env:
+          SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Check the key against Resend's API
+        env:
+          AWS_HOST: ${{ secrets.AWS_HOST }}
+          AWS_USER: ${{ secrets.AWS_USER }}
+        run: |
+          ssh-keyscan -H "$AWS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa "$AWS_USER@$AWS_HOST" 'bash -s' <<'REMOTE'
+            set -e
+            ENV_FILE=/var/www/nse-tracker/api/.env
+            KEY=$(sudo -n grep '^RESEND_API_KEY=' "$ENV_FILE" | cut -d= -f2-)
+            if [ -z "$KEY" ]; then
+              echo "No RESEND_API_KEY found in $ENV_FILE"
+              exit 1
+            fi
+            echo "Key present in .env, length ${#KEY} chars, prefix: ${KEY:0:3}..."
+            CODE=$(curl -s -o /tmp/resend_resp.json -w '%{http_code}' \
+              -H "Authorization: Bearer $KEY" https://api.resend.com/domains)
+            echo "Resend API responded: HTTP $CODE"
+            case "$CODE" in
+              200) echo "VALID: the key authenticates successfully with Resend." ;;
+              401) echo "INVALID: Resend rejected this key (401 Unauthorized)." ;;
+              *) echo "UNEXPECTED: got HTTP $CODE - response body follows"; cat /tmp/resend_resp.json ;;
+            esac
+            rm -f /tmp/resend_resp.json
+          REMOTE
+
+      - name: Clean up key
+        if: always()
+        run: rm -f ~/.ssh/id_rsa
