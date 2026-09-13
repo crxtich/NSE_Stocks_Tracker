@@ -20,7 +20,7 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Dump api-server source files
+      - name: Dump nse_db schema
         env:
           AWS_HOST: ${{ secrets.AWS_HOST }}
           AWS_USER: ${{ secrets.AWS_USER }}
@@ -28,12 +28,14 @@ jobs:
           ssh-keyscan -H "$AWS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
           ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa "$AWS_USER@$AWS_HOST" 'bash -s' <<'REMOTE'
             set +e
-            DIR=/var/www/nse-tracker/src/api-server
-            for f in package.json server.js routes.js db.js validate.js scrape.js; do
-              echo "##### FILE_START: $f #####"
-              sudo -n cat "$DIR/$f" 2>&1
-              echo "##### FILE_END: $f #####"
+            for t in newsletter_subscribers price_snapshots watchlist; do
+              echo "##### TABLE: $t #####"
+              sudo -n -u postgres psql -d nse_db -c "\d $t" 2>&1
             done
+            echo "##### VIEW: newsletter_subscriber_count #####"
+            sudo -n -u postgres psql -d nse_db -c "\d+ newsletter_subscriber_count" 2>&1
+            echo "##### env keys present in api/.env (names only, not values) #####"
+            sudo -n grep -o '^[A-Z_]*=' /var/www/nse-tracker/api/.env 2>&1
           REMOTE
 
       - name: Clean up key
