@@ -46,11 +46,12 @@ jobs:
             echo "=== crontab (ubuntu user) ==="
             crontab -l 2>&1
             echo
-            echo "=== search for nse-related directories ==="
-            find /home /var/www /opt /srv -maxdepth 4 -iname "*nse*" 2>/dev/null
+            echo "=== nse-related directories (excluding node_modules/dist/.git) ==="
+            find /home /var/www /opt /srv -maxdepth 3 -iname "*nse*" \
+              -not -path "*/node_modules/*" -not -path "*/dist/*" -not -path "*/.git/*" 2>/dev/null
             echo
-            echo "=== existing postgres databases ==="
-            sudo -n -u postgres psql -c "\l" 2>&1
+            echo "=== nse_db tables (if reachable) ==="
+            sudo -n -u postgres psql -d nse_db -c "\dt" 2>&1
           REMOTE
 
       - name: Clean up key
