@@ -28,7 +28,15 @@ jobs:
           AWS_USER: ${{ secrets.AWS_USER }}
         run: |
           ssh-keyscan -H "$AWS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
-          ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa "$AWS_USER@$AWS_HOST" 'bash -s' <<'REMOTE'
+          SSH="ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa $AWS_USER@$AWS_HOST"
+
+          # Written to a real file and executed separately (not piped as
+          # stdin to a remote `bash -s`) — several commands inside spawn
+          # their own ssh/git subprocesses, which would otherwise compete
+          # for the same stdin stream as the heredoc and truncate the script
+          # (this bit us on the first attempt: the script silently stopped
+          # after its first ssh subprocess).
+          $SSH 'cat > /tmp/cutover-step2.sh' <<'REMOTE'
             set -e
             ROOT=/var/www/nse-tracker
             SSH_DIR="$ROOT/.ssh"
@@ -105,6 +113,8 @@ jobs:
             echo "=== tail of deploy.log ==="
             sudo -n tail -60 "$ROOT/logs/deploy.log" 2>&1
           REMOTE
+
+          $SSH 'bash /tmp/cutover-step2.sh < /dev/null; rm -f /tmp/cutover-step2.sh'
 
       - name: Clean up key
         if: always()
