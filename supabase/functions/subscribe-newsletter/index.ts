@@ -24,6 +24,17 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}))
+
+    // Honeypot: a form field real visitors never see or fill (see
+    // SubscribeForm.tsx). A bot that fills every field trips this — pretend
+    // success without touching the database, so it isn't tipped off.
+    if (typeof body.company === 'string' && body.company.trim() !== '') {
+      return Response.json(
+        { status: 'ok', message: 'Check your inbox to confirm your subscription.' },
+        { headers: corsHeaders },
+      )
+    }
+
     const normalized = typeof body.email === 'string' ? body.email.trim().toLowerCase() : ''
 
     if (!EMAIL_RE.test(normalized)) {

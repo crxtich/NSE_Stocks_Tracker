@@ -11,6 +11,11 @@ export default function SubscribeForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [message, setMessage] = useState('')
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null)
+  // Honeypot: a field real visitors never see or fill, but bots that
+  // blindly fill every form field will. Left non-empty, the backend
+  // silently pretends success instead of erroring — an error response
+  // would tip off more sophisticated bots that they were detected.
+  const [company, setCompany] = useState('')
 
   useEffect(() => {
     fetchSubscriberCount()
@@ -30,7 +35,7 @@ export default function SubscribeForm() {
           Authorization: `Bearer ${ANON_KEY}`,
           apikey: ANON_KEY,
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, company }),
       })
       const data = await res.json()
       if (!res.ok || data.status !== 'ok') throw new Error(data.message || 'Something went wrong.')
@@ -64,6 +69,16 @@ export default function SubscribeForm() {
         <p className="mt-4 text-sm font-medium text-gain">{message}</p>
       ) : (
         <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-2 sm:max-w-md sm:flex-row">
+          <input
+            type="text"
+            name="company"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="absolute -left-[9999px] h-px w-px opacity-0"
+          />
           <input
             type="email"
             required
