@@ -1,18 +1,13 @@
-# Tests a Resend API key against Resend's own API BEFORE installing it.
-# Only writes it to api/.env and restarts the service if Resend confirms
-# the key is valid — an invalid key is reported and nothing on the server
-# changes. The key is supplied at trigger time, never committed to this
-# file, and piped via stdin rather than passed as a literal argument
-# anywhere it could be echoed.
+# Tests the RESEND_API_KEY repo secret against Resend's own API BEFORE
+# installing it. Only writes it to api/.env and restarts the service if
+# Resend confirms the key is valid — an invalid key is reported and nothing
+# on the server changes. Reads the key from a real GitHub secret (added via
+# Settings -> Secrets and variables -> Actions), which GitHub auto-masks in
+# all log output, rather than a workflow_dispatch input.
 name: Verify and install Resend API key
 
 on:
-  workflow_dispatch:
-    inputs:
-      resend_api_key:
-        description: 'Resend API key (re_...)'
-        required: true
-        type: string
+  workflow_dispatch: {}
 
 jobs:
   verify_and_install:
@@ -30,7 +25,7 @@ jobs:
         env:
           AWS_HOST: ${{ secrets.AWS_HOST }}
           AWS_USER: ${{ secrets.AWS_USER }}
-          RESEND_KEY: ${{ inputs.resend_api_key }}
+          RESEND_KEY: ${{ secrets.RESEND_API_KEY }}
         run: |
           ssh-keyscan -H "$AWS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
           SSH="ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa $AWS_USER@$AWS_HOST"
