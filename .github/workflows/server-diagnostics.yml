@@ -1,1 +1,67 @@
-IyBSZWFkLW9ubHkgbG9vayBhdCB0aGUgRHVrYXJpYnUgQVdTIGJveCBiZWZvcmUgYW55dGhpbmcgZ2V0cyBpbnN0YWxsZWQgb24KIyBpdC4gUnVucyBub3RoaW5nIGRlc3RydWN0aXZlIOKAlCBqdXN0IHJlcG9ydHMgd2hhdCdzIGFscmVhZHkgdGhlcmUsIHNpbmNlCiMgdGhlIHNlcnZlciBpcyBzaGFyZWQgd2l0aCBvdGhlciBwcm9qZWN0cy4gVHJpZ2dlciBtYW51YWxseSBmcm9tIHRoZQojIEFjdGlvbnMgdGFiIChvciB2aWEgdGhlIEFQSSkgb25jZSB0aGUgQVdTX1NTSF9LRVkgLyBBV1NfSE9TVCAvIEFXU19VU0VSCiMgc2VjcmV0cyBhcmUgc2V0LgpuYW1lOiBTZXJ2ZXIgRGlhZ25vc3RpY3MgKHJlYWQtb25seSkKCm9uOgogIHdvcmtmbG93X2Rpc3BhdGNoOiB7fQoKam9iczoKICBkaWFnbm9zdGljczoKICAgIHJ1bnMtb246IHVidW50dS1sYXRlc3QKICAgIHN0ZXBzOgogICAgICAtIG5hbWU6IFNldCB1cCBTU0gga2V5CiAgICAgICAgZW52OgogICAgICAgICAgU1NIX0tFWTogJHt7IHNlY3JldHMuQVdTX1NTSF9LRVkgfX0KICAgICAgICBydW46IHwKICAgICAgICAgIG1rZGlyIC1wIH4vLnNzaAogICAgICAgICAgcHJpbnRmICclc1xuJyAiJFNTSF9LRVkiID4gfi8uc3NoL2lkX3JzYQogICAgICAgICAgY2htb2QgNjAwIH4vLnNzaC9pZF9yc2EKCiAgICAgIC0gbmFtZTogUnVuIHJlYWQtb25seSBkaWFnbm9zdGljcwogICAgICAgIGVudjoKICAgICAgICAgIEFXU19IT1NUOiAke3sgc2VjcmV0cy5BV1NfSE9TVCB9fQogICAgICAgICAgQVdTX1VTRVI6ICR7eyBzZWNyZXRzLkFXU19VU0VSIH19CiAgICAgICAgcnVuOiB8CiAgICAgICAgICBzc2gta2V5c2NhbiAtSCAiJEFXU19IT1NUIiA+PiB+Ly5zc2gva25vd25faG9zdHMgMj4vZGV2L251bGwKICAgICAgICAgIHNzaCAtbyBTdHJpY3RIb3N0S2V5Q2hlY2tpbmc9eWVzIC1pIH4vLnNzaC9pZF9yc2EgIiRBV1NfVVNFUkAkQVdTX0hPU1QiICdiYXNoIC1zJyA8PCdSRU1PVEUnCiAgICAgICAgICAgIHNldCArZQogICAgICAgICAgICBlY2hvICI9PT0gd2hvYW1pIC8gdXB0aW1lID09PSIKICAgICAgICAgICAgd2hvYW1pOyB1cHRpbWUKICAgICAgICAgICAgZWNobwogICAgICAgICAgICBlY2hvICI9PT0gT1MgPT09IgogICAgICAgICAgICBjYXQgL2V0Yy9vcy1yZWxlYXNlIDI+L2Rldi9udWxsCiAgICAgICAgICAgIGVjaG8KICAgICAgICAgICAgZWNobyAiPT09IERpc2sgPT09IgogICAgICAgICAgICBkZiAtaAogICAgICAgICAgICBlY2hvCiAgICAgICAgICAgIGVjaG8gIj09PSBNZW1vcnkgPT09IgogICAgICAgICAgICBmcmVlIC1oCiAgICAgICAgICAgIGVjaG8KICAgICAgICAgICAgZWNobyAiPT09IERvY2tlciBjb250YWluZXJzIChpZiBkb2NrZXIgaXMgaW5zdGFsbGVkKSA9PT0iCiAgICAgICAgICAgIGlmIGNvbW1hbmQgLXYgZG9ja2VyID4vZGV2L251bGw7IHRoZW4gc3VkbyAtbiBkb2NrZXIgcHMgLWEgMj4mMTsgZWxzZSBlY2hvICJkb2NrZXI6IG5vdCBpbnN0YWxsZWQiOyBmaQogICAgICAgICAgICBlY2hvCiAgICAgICAgICAgIGVjaG8gIj09PSBMaXN0ZW5pbmcgcG9ydHMgPT09IgogICAgICAgICAgICBzdWRvIC1uIHNzIC10dWxwbiAyPiYxCiAgICAgICAgICAgIGVjaG8KICAgICAgICAgICAgZWNobyAiPT09IFJ1bm5pbmcgc3lzdGVtZCBzZXJ2aWNlcyA9PT0iCiAgICAgICAgICAgIHN5c3RlbWN0bCBsaXN0LXVuaXRzIC0tdHlwZT1zZXJ2aWNlIC0tc3RhdGU9cnVubmluZyAtLW5vLXBhZ2VyIDI+JjEKICAgICAgICAgICAgZWNobwogICAgICAgICAgICBlY2hvICI9PT0gbmdpbnggc2l0ZXMtZW5hYmxlZCAoaWYgbmdpbnggaXMgaW5zdGFsbGVkKSA9PT0iCiAgICAgICAgICAgIGxzIC1sYSAvZXRjL25naW54L3NpdGVzLWVuYWJsZWQvIDI+JjEgfHwgZWNobyAibm8gL2V0Yy9uZ2lueC9zaXRlcy1lbmFibGVkIgogICAgICAgICAgICBlY2hvCiAgICAgICAgICAgIGVjaG8gIj09PSBSdW50aW1lcyAvIHRvb2xpbmcgcHJlc2VudCA9PT0iCiAgICAgICAgICAgIGZvciBjIGluIG5vZGUgbnBtIGRvY2tlciBkb2NrZXItY29tcG9zZSBwc3FsIHBvc3RncmVzIG5naW54IHBtMiBweXRob24zIGNlcnRib3Q7IGRvCiAgICAgICAgICAgICAgaWYgY29tbWFuZCAtdiAiJGMiID4vZGV2L251bGw7IHRoZW4KICAgICAgICAgICAgICAgIHByaW50ZiAnJXM6ICcgIiRjIjsgIiRjIiAtLXZlcnNpb24gMj4mMSB8IGhlYWQgLTEKICAgICAgICAgICAgICBlbHNlCiAgICAgICAgICAgICAgICBlY2hvICIkYzogbm90IGZvdW5kIgogICAgICAgICAgICAgIGZpCiAgICAgICAgICAgIGRvbmUKICAgICAgICAgIFJFTU9URQoKICAgICAgLSBuYW1lOiBDbGVhbiB1cCBrZXkKICAgICAgICBpZjogYWx3YXlzKCkKICAgICAgICBydW46IHJtIC1mIH4vLnNzaC9pZF9yc2EK
+# Read-only look at the Dukaribu AWS box before anything gets installed on
+# it. Runs nothing destructive — just reports what's already there, since
+# the server is shared with other projects. Trigger manually from the
+# Actions tab (or via the API) once the AWS_SSH_KEY / AWS_HOST / AWS_USER
+# secrets are set.
+name: Server Diagnostics (read-only)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  diagnostics:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up SSH key
+        env:
+          SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Run read-only diagnostics
+        env:
+          AWS_HOST: ${{ secrets.AWS_HOST }}
+          AWS_USER: ${{ secrets.AWS_USER }}
+        run: |
+          ssh-keyscan -H "$AWS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa "$AWS_USER@$AWS_HOST" 'bash -s' <<'REMOTE'
+            set +e
+            echo "=== whoami / uptime ==="
+            whoami; uptime
+            echo
+            echo "=== OS ==="
+            cat /etc/os-release 2>/dev/null
+            echo
+            echo "=== Disk ==="
+            df -h
+            echo
+            echo "=== Memory ==="
+            free -h
+            echo
+            echo "=== Docker containers (if docker is installed) ==="
+            if command -v docker >/dev/null; then sudo -n docker ps -a 2>&1; else echo "docker: not installed"; fi
+            echo
+            echo "=== Listening ports ==="
+            sudo -n ss -tulpn 2>&1
+            echo
+            echo "=== Running systemd services ==="
+            systemctl list-units --type=service --state=running --no-pager 2>&1
+            echo
+            echo "=== nginx sites-enabled (if nginx is installed) ==="
+            ls -la /etc/nginx/sites-enabled/ 2>&1 || echo "no /etc/nginx/sites-enabled"
+            echo
+            echo "=== Runtimes / tooling present ==="
+            for c in node npm docker docker-compose psql postgres nginx pm2 python3 certbot; do
+              if command -v "$c" >/dev/null; then
+                printf '%s: ' "$c"; "$c" --version 2>&1 | head -1
+              else
+                echo "$c: not found"
+              fi
+            done
+          REMOTE
+
+      - name: Clean up key
+        if: always()
+        run: rm -f ~/.ssh/id_rsa
