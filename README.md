@@ -6,20 +6,21 @@ quantitative signals — momentum, trend, stability, and a single composite scor
 without relying on news, analyst opinions, or company fundamentals. It's built to be read by
 anyone, not just finance professionals.
 
-**Live site:** [nse-tracker.crotich.com](https://nse-tracker.crotich.com/)
+**Live site:** [nse-tracker.dukaribu.com](https://nse-tracker.dukaribu.com/)
 
 ## Tech stack
 
 | Layer | Choice | Why |
 |---|---|---|
 | Data source | `live.mystocks.co.ke/m/pricelist` | A publicly available NSE price list, scraped on a schedule. |
-| Scraper | Supabase Edge Function (Deno) | Runs on a cron schedule server-side, close to the database it writes to. |
-| Database | Supabase (PostgreSQL) | Managed Postgres with Row Level Security, so the public frontend can read data safely without ever writing to it. |
+| Scraper | `api-server/scrape.js`, run from cron | A plain Node script, close to the database it writes to. |
+| Database | Self-hosted PostgreSQL | Runs on the same box as the API — no managed service, no network hop. |
+| API | Express (`api-server/`) | A small read-only REST API plus the newsletter subscribe/confirm/unsubscribe flow. |
 | Frontend | React + Vite + TypeScript | Fast dev loop, small production bundle, fully static output. |
 | Charts | Recharts | Lightweight, composable charting built on SVG. |
 | Styling | Tailwind CSS | Utility-first styling that keeps the dark, data-dense design consistent. |
-| Hosting | GitHub Pages | Free static hosting, deployed automatically from CI. |
-| CI/CD | GitHub Actions | Builds the frontend and deploys it straight to GitHub Pages (native Actions deployment — no separate build branch) on every push. |
+| Hosting | Self-hosted (nginx + PM2) | Static frontend served by nginx; the API runs under PM2 on the same server. |
+| CI/CD | Push-to-deploy webhook | A GitHub push fires a signed webhook that builds and swaps in the new release — see "Deploying" below. |
 
 ## What's on the site
 
@@ -31,112 +32,103 @@ anyone, not just finance professionals.
 Every score on the site is a mathematical signal derived from price and volume data — never a
 buy or sell recommendation. See the disclaimer on every analysis page.
 
-## Setup
+## Local development
 
-### 1. Fork and clone
-
-Fork this repository, then clone your fork locally.
-
-### 2. Create a Supabase project
-
-1. Create a new project at [supabase.com](https://supabase.com).
-2. Open the SQL editor and run the contents of [`supabase/migrations/001_initial_schema.sql`](supabase/migrations/001_initial_schema.sql). This creates the `price_snapshots` and `watchlist` tables, enables Row Level Security with public-read/no-write policies, and seeds the watchlist.
-3. Note your **Project URL** and **anon public key** (Project Settings → API) — you'll need these for the frontend. Note the **service role key** too, but treat it as a secret — it bypasses Row Level Security entirely and must never reach the frontend or a public repo.
-
-### 3. Deploy the scraper Edge Function
-
-With the [Supabase CLI](https://supabase.com/docs/guides/cli) installed and linked to your project:
+The frontend needs no environment variables — it talks to the API at a relative `/api/` path
+(`vite.config.ts` proxies that to `http://127.0.0.1:3015` in dev, matching nginx in production).
 
 ```bash
-supabase functions deploy scrape-nse
-supabase secrets set SUPABASE_URL=https://your-project-ref.supabase.co
-supabase secrets set SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-```
-
-### 4. Schedule the scraper
-
-In the Supabase Dashboard, go to **Edge Functions → scrape-nse → Cron** and schedule it to run
-every 30 minutes on weekdays, e.g.:
-
-```
-*/30 8-16 * * 1-5
-```
-
-(This runs a little outside NSE trading hours too, which is fine — outside the 09:00–15:30 EAT
-session the function still runs but prices will simply be flat, which is expected.)
-
-Alternatively, use `pg_cron` + `pg_net` from the SQL editor if you prefer a database-driven
-schedule instead of the Dashboard UI.
-
-You can check the scraper is alive at any time by hitting its health check:
-
-```
-GET https://your-project-ref.supabase.co/functions/v1/scrape-nse?health=true
-```
-
-### 5. Configure the frontend locally (optional)
-
-```bash
-cp .env.example .env
-# fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 npm install
 npm run dev
 ```
 
-The anon key is safe to expose in frontend code — the Row Level Security policies restrict it
-to read-only access.
+To run the API locally too:
 
-### 6. Add GitHub Secrets and deploy
+```bash
+cd api-server
+npm install
+cp ../.env.example .env   # fill in DATABASE_URL at minimum
+npm start
+```
 
-In your fork's **Settings → Secrets and variables → Actions**, add:
+## Deploying
 
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
+`main` is the deploy branch. Push to it and the site updates itself:
 
-In **Settings → Pages → Build and deployment → Source**, choose **GitHub Actions** (not
-"Deploy from a branch" — there is no build-output branch in this setup, the workflow uploads
-the built site directly). Push to your default branch — GitHub Actions will build the site and
-deploy it automatically on every push, no extra branch required.
+```
+git push origin main      # -> GitHub webhook -> server -> build -> swap -> health check
+```
 
-## How it stays up to date
+### What happens on a push
 
-Once deployed, the site updates itself automatically: the Supabase cron job scrapes fresh
-prices every 30 minutes during NSE trading hours (Monday–Friday, 09:00–15:30 EAT) and writes
-them straight to the database. The frontend reads that data live on every page load — there's
-no separate rebuild step required to see new prices.
+GitHub POSTs to `https://nse-tracker.dukaribu.com/_deploy`. A loopback listener
+(`deploy/webhook-listener.mjs`, running as `www-data`) verifies the HMAC signature and
+spawns `deploy/deploy.sh`, which:
+
+1. refuses to start if the server has under 250 MB of usable memory
+2. `git fetch` + `git reset --hard origin/main`
+3. builds the frontend into `releases/<stamp>/` with the Node heap capped
+4. `pg_dump`s the database to `backups/` and aborts if the dump is empty
+5. copies `api-server/*` into the live API directory (reinstalling deps only if `package.json` changed)
+6. swaps the new `dist/` into place, keeping the old one
+7. restarts the API under PM2 and health-checks `127.0.0.1:3015/health`
+8. **rolls back automatically** if that check fails
+
+Any failure before step 6 leaves the live site completely untouched.
+
+### Gotchas
+
+- **`deploy.sh` destroys local edits in the server's checkout.** All code must travel through
+  GitHub; there is no way to deploy a server-local change.
+- **A push made from the server itself may not fire the webhook.** Run
+  `FORCE_DEPLOY=1 deploy/deploy.sh` by hand in that case.
+- **The script no-ops when HEAD already equals `origin/main`.** Same fix: `FORCE_DEPLOY=1`.
+- `.env` files are gitignored and live only on the server.
+
+### Checking a deploy
+
+```
+cat .last_deploy_status
+tail -40 logs/deploy.log
+tail -20 logs/webhook.log
+journalctl -t nse-deploy -n 20
+```
 
 ## Email updates
 
 The site has a "Get occasional updates" subscribe form (Market Overview page) for personal
-notes — stocks being watched, what's been bought, things learned building the tracker. It's
-self-hosted: subscribers live in a `newsletter_subscribers` table (no RLS policies at all —
-everything goes through the Edge Functions below, using the service role key), and email
-sending goes through [Resend](https://resend.com)'s free tier.
+notes — stocks being watched, what's been bought, things learned building the tracker.
+Subscribers live in the `newsletter_subscribers` table, and email sending goes through
+[Resend](https://resend.com)'s free tier via `api-server/email.js`.
 
-**One-time setup**, as Supabase Edge Function secrets:
+**One-time setup**, in `api-server/.env` on the server (see `.env.example`):
 
 ```bash
-supabase secrets set RESEND_API_KEY=re_your_resend_api_key
-supabase secrets set NEWSLETTER_ADMIN_SECRET=some-long-random-string-only-you-know
+RESEND_API_KEY=re_your_resend_api_key
+NEWSLETTER_ADMIN_SECRET=some-long-random-string-only-you-know
+SITE_URL=https://nse-tracker.dukaribu.com
 # Optional, once a custom domain is verified in the Resend dashboard —
 # otherwise emails send from Resend's shared onboarding@resend.dev sandbox sender.
-supabase secrets set RESEND_FROM_EMAIL="NSE Market Intelligence <updates@yourdomain.com>"
+RESEND_FROM_EMAIL="NSE Market Intelligence <updates@yourdomain.com>"
+# Optional — a one-line email whenever someone confirms a subscription.
+OWNER_NOTIFICATION_EMAIL=you@yourdomain.com
 ```
 
-Four Edge Functions handle the flow:
+Five routes in `api-server/routes.js` handle the flow:
 
-| Function | Trigger | What it does |
+| Route | Trigger | What it does |
 |---|---|---|
-| `subscribe-newsletter` | Fetch from the site's form | Validates the email, stores it unconfirmed, sends a confirmation email |
-| `confirm-subscription` | Link click, from the confirmation email | Marks the subscriber confirmed |
-| `unsubscribe` | Link click, in every update email's footer | Removes the subscriber |
-| `send-newsletter` | Manual — see below | Broadcasts an update to every confirmed subscriber |
+| `POST /api/subscribe` | Fetch from the site's form | Validates the email (and checks a honeypot field), stores it unconfirmed, sends a confirmation email |
+| `GET /api/confirm-subscription` | Link click, from the confirmation email | Marks the subscriber confirmed, sends a welcome email |
+| `GET /api/unsubscribe` | Link click, in every update email's footer | Removes the subscriber |
+| `POST /api/send-newsletter` | Manual — see below | Broadcasts an update to every confirmed subscriber |
+| `GET /api/subscriber-count` | Loaded by the subscribe form | Public count of confirmed subscribers only |
 
-There's no admin UI for sending an update — invoke the function directly whenever there's
+There's no admin UI for sending an update — invoke the endpoint directly whenever there's
 something worth sharing:
 
 ```bash
-curl -X POST 'https://lvtjtxtfminipebdwaxi.supabase.co/functions/v1/send-newsletter' \
+curl -X POST 'https://nse-tracker.dukaribu.com/api/send-newsletter' \
   -H 'x-admin-secret: <your NEWSLETTER_ADMIN_SECRET>' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -150,27 +142,21 @@ working unsubscribe link appended automatically — just write the update itself
 
 ## Reading the data programmatically
 
-The database is a public, read-only Supabase REST API (PostgREST) — no scraping or headless
-browser needed to get the underlying data out. `price_snapshots` and `watchlist` are exposed
-directly, plus a `latest_price_snapshots` view (one row per ticker: its most recent snapshot)
-so a single call returns current market state without dedup logic.
-
-PostgREST normally expects the API key as an `apikey` header, which a plain link can't carry —
-but Supabase's gateway also accepts it as a query parameter, so these work as plain URLs (safe
-to share: this is the anon key, already public in the frontend bundle, and RLS restricts it to
-read-only regardless):
+The API is public and read-only — no scraping or headless browser needed to get the underlying
+data out:
 
 ```
-# Current price/volume for every tracked stock, sorted by % change
-https://lvtjtxtfminipebdwaxi.supabase.co/rest/v1/latest_price_snapshots?select=ticker,company_name,price,change_pct,volume,scraped_at&order=change_pct.desc&apikey=<anon key>
+# Every tracked stock's price history for the last N days (default 30)
+GET https://nse-tracker.dukaribu.com/api/history?days=30
 
-# The 29-ticker watchlist
-https://lvtjtxtfminipebdwaxi.supabase.co/rest/v1/watchlist?select=*&apikey=<anon key>
+# Every snapshot in an arbitrary date range (both bounds optional)
+GET https://nse-tracker.dukaribu.com/api/snapshots?from=2026-01-01&to=2026-02-01
+
+# The tracked-company watchlist
+GET https://nse-tracker.dukaribu.com/api/watchlist
 ```
 
-(Get the current anon key from Project Settings → API in the Supabase dashboard.) Standard
-PostgREST query syntax applies for filtering/sorting/paging — see the
-[PostgREST docs](https://postgrest.org/en/stable/references/api/tables_views.html).
+`days` must be a whole number between 1 and 3650; date bounds are ISO 8601.
 
 ## Disclaimer
 

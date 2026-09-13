@@ -1,10 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Mail } from 'lucide-react'
-import { fetchSubscriberCount } from '../lib/supabase'
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
-const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
-const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/subscribe-newsletter`
+import { fetchSubscriberCount } from '../lib/api'
 
 export default function SubscribeForm() {
   const [email, setEmail] = useState('')
@@ -28,13 +24,9 @@ export default function SubscribeForm() {
     setStatus('loading')
     setMessage('')
     try {
-      const res = await fetch(FUNCTION_URL, {
+      const res = await fetch('/api/subscribe', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${ANON_KEY}`,
-          apikey: ANON_KEY,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, company }),
       })
       const data = await res.json()

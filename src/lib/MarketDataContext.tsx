@@ -4,7 +4,7 @@ import {
   fetchWatchlist,
   type PriceSnapshot,
   type WatchlistEntry,
-} from './supabase'
+} from './api'
 import {
   analyzeTicker,
   buildMarketDailyReturns,

@@ -1,4 +1,4 @@
-import type { PriceSnapshot } from './supabase'
+import type { PriceSnapshot } from './api'
 import { formatEatTime } from './format'
 
 export type ExportRangeMode = 'fixed' | 'custom' | 'all'
@@ -10,7 +10,7 @@ export interface ExportRange {
   customTo?: string // yyyy-mm-dd
 }
 
-const SITE_URL = 'https://nse-tracker.crotich.com/'
+const SITE_URL = 'https://nse-tracker.dukaribu.com/'
 const AUTHOR_URL = 'https://www.linkedin.com/in/crotich/'
 
 const BRAND_LINES = [

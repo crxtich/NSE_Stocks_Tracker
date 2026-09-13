@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nse-tracker.crotich.com/sitemap.xml
+Sitemap: https://nse-tracker.dukaribu.com/sitemap.xml
