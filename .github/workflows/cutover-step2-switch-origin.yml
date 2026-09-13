@@ -1,0 +1,111 @@
+# Second and final step of moving nse-tracker.dukaribu.com's deploy pipeline
+# from khalilaj/nse-tracker to this repo. Requires that the public key and
+# webhook secret printed by cutover-step1 have already been added on
+# GitHub (Deploy key + Webhook on crxtich/NSE_Stocks_Tracker).
+#
+# Tests the new deploy key over SSH BEFORE changing any config, so a missing
+# or not-yet-added key fails loudly without touching the working setup.
+name: Cutover step 2 - switch origin to this repo
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  switch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up SSH key
+        env:
+          SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Switch origin, webhook secret, and deploy scripts
+        env:
+          AWS_HOST: ${{ secrets.AWS_HOST }}
+          AWS_USER: ${{ secrets.AWS_USER }}
+        run: |
+          ssh-keyscan -H "$AWS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa "$AWS_USER@$AWS_HOST" 'bash -s' <<'REMOTE'
+            set -e
+            ROOT=/var/www/nse-tracker
+            SSH_DIR="$ROOT/.ssh"
+            NEW_KEY="$SSH_DIR/id_ed25519_crxtich"
+            SAFE="-c safe.directory=$ROOT/src"
+
+            echo "=== 1. testing the new deploy key against GitHub (before changing anything) ==="
+            sudo -n -u www-data ssh -o StrictHostKeyChecking=accept-new -i "$NEW_KEY" -T git@github.com 2>&1 | tee /tmp/ghtest.log || true
+            if ! grep -q "successfully authenticated" /tmp/ghtest.log; then
+              echo "FAILED: GitHub did not accept the new deploy key yet."
+              echo "Make sure the public key was added as a Deploy Key on crxtich/NSE_Stocks_Tracker, then re-run this workflow."
+              exit 1
+            fi
+            echo "OK: GitHub accepted the new key."
+
+            echo
+            echo "=== 2. pointing the SSH config at the new key ==="
+            sudo -n -u www-data cp "$SSH_DIR/config" "$SSH_DIR/config.bak-khalilaj"
+            sudo -n -u www-data sed -i "s#IdentityFile .*#IdentityFile $NEW_KEY#" "$SSH_DIR/config"
+            sudo -n cat "$SSH_DIR/config"
+
+            echo
+            echo "=== 3. repointing the git remote ==="
+            sudo -n git $SAFE -C "$ROOT/src" remote set-url origin git@github.com:crxtich/NSE_Stocks_Tracker.git
+            sudo -n -u www-data env GIT_SSH_COMMAND="ssh -F $SSH_DIR/config" git $SAFE -C "$ROOT/src" ls-remote origin main
+            echo "OK: remote responds."
+
+            echo
+            echo "=== 4. installing the new webhook secret ==="
+            if [ -f "$ROOT/.new_webhook_secret" ]; then
+              sudo -n cp "$ROOT/.webhook_secret" "$ROOT/.webhook_secret.bak-khalilaj" 2>/dev/null || true
+              sudo -n mv "$ROOT/.new_webhook_secret" "$ROOT/.webhook_secret"
+              sudo -n chown www-data:www-data "$ROOT/.webhook_secret"
+              sudo -n chmod 600 "$ROOT/.webhook_secret"
+              echo "OK: webhook secret installed."
+            else
+              echo "WARNING: no .new_webhook_secret found - keeping the existing secret."
+            fi
+
+            echo
+            echo "=== 5. restarting the webhook listener to pick up the new secret ==="
+            sudo -n systemctl restart nse-webhook.service
+            sleep 1
+            sudo -n systemctl is-active nse-webhook.service
+
+            echo
+            echo "=== 6. fetching the new source so the updated deploy/ scripts exist locally ==="
+            sudo -n -u www-data env GIT_SSH_COMMAND="ssh -F $SSH_DIR/config" git $SAFE -C "$ROOT/src" fetch --prune origin main
+            sudo -n -u www-data git $SAFE -C "$ROOT/src" reset --hard origin/main
+            echo "source now at $(sudo -n -u www-data git $SAFE -C "$ROOT/src" rev-parse HEAD)"
+
+            echo
+            echo "=== 7. updating the on-server deploy scripts (were untracked before this cutover) ==="
+            sudo -n cp "$ROOT/src/deploy/deploy.sh" "$ROOT/deploy/deploy.sh"
+            sudo -n cp "$ROOT/src/deploy/webhook-listener.mjs" "$ROOT/deploy/webhook-listener.mjs"
+            sudo -n chmod +x "$ROOT/deploy/deploy.sh"
+            sudo -n chown www-data:www-data "$ROOT/deploy/deploy.sh" "$ROOT/deploy/webhook-listener.mjs"
+            echo "OK: deploy scripts updated."
+
+            echo
+            echo "=== 8. restarting the webhook listener again (its own source may have changed) ==="
+            sudo -n systemctl restart nse-webhook.service
+            sleep 1
+            sudo -n systemctl is-active nse-webhook.service
+
+            echo
+            echo "=== 9. running the (now updated) deploy script ==="
+            sudo -n -u www-data env FORCE_DEPLOY=1 DEPLOY_BRANCH=main bash "$ROOT/deploy/deploy.sh" --reason "cutover to crxtich/NSE_Stocks_Tracker" || true
+
+            echo
+            echo "=== deploy result ==="
+            sudo -n cat "$ROOT/.last_deploy_status" 2>&1
+            echo
+            echo "=== tail of deploy.log ==="
+            sudo -n tail -60 "$ROOT/logs/deploy.log" 2>&1
+          REMOTE
+
+      - name: Clean up key
+        if: always()
+        run: rm -f ~/.ssh/id_rsa
