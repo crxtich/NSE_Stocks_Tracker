@@ -1,0 +1,81 @@
+# Tests a Resend API key against Resend's own API BEFORE installing it.
+# Only writes it to api/.env and restarts the service if Resend confirms
+# the key is valid — an invalid key is reported and nothing on the server
+# changes. The key is supplied at trigger time, never committed to this
+# file, and piped via stdin rather than passed as a literal argument
+# anywhere it could be echoed.
+name: Verify and install Resend API key
+
+on:
+  workflow_dispatch:
+    inputs:
+      resend_api_key:
+        description: 'Resend API key (re_...)'
+        required: true
+        type: string
+
+jobs:
+  verify_and_install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up SSH key
+        env:
+          SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Verify, then install only if valid
+        env:
+          AWS_HOST: ${{ secrets.AWS_HOST }}
+          AWS_USER: ${{ secrets.AWS_USER }}
+          RESEND_KEY: ${{ inputs.resend_api_key }}
+        run: |
+          ssh-keyscan -H "$AWS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          SSH="ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa $AWS_USER@$AWS_HOST"
+
+          # Piped via stdin, never a command-line argument or echoed value.
+          printf '%s' "$RESEND_KEY" | $SSH 'cat > /tmp/.resend_key_value && chmod 600 /tmp/.resend_key_value'
+
+          $SSH 'cat > /tmp/verify-install.sh' <<'REMOTE'
+            set -e
+            KEYFILE=/tmp/.resend_key_value
+            KEY=$(cat "$KEYFILE")
+
+            echo "=== testing against Resend's API ==="
+            CODE=$(curl -s -o /tmp/resend_resp.json -w '%{http_code}' \
+              -H "Authorization: Bearer $KEY" https://api.resend.com/domains)
+            echo "Resend responded: HTTP $CODE"
+
+            if [ "$CODE" != "200" ]; then
+              echo "INVALID - not installing. Response:"
+              cat /tmp/resend_resp.json
+              rm -f "$KEYFILE" /tmp/resend_resp.json
+              exit 1
+            fi
+            echo "VALID - installing."
+            rm -f /tmp/resend_resp.json
+
+            ENV_FILE=/var/www/nse-tracker/api/.env
+            sudo -n test -f "$ENV_FILE"
+            sudo -n sed -i '/^RESEND_API_KEY=/d' "$ENV_FILE"
+            printf 'RESEND_API_KEY=' | sudo -n tee -a "$ENV_FILE" > /dev/null
+            sudo -n bash -c 'cat '"$KEYFILE"' >> '"$ENV_FILE"
+            printf '\n' | sudo -n tee -a "$ENV_FILE" > /dev/null
+            sudo -n chown www-data:www-data "$ENV_FILE"
+            sudo -n chmod 600 "$ENV_FILE"
+            rm -f "$KEYFILE"
+            echo "RESEND_API_KEY installed."
+
+            sudo -n -u www-data pm2 restart nse-tracker-api --update-env
+            sleep 2
+            curl -fsS http://127.0.0.1:3015/health && echo
+            echo "OK: api restarted and healthy."
+          REMOTE
+
+          $SSH 'bash /tmp/verify-install.sh < /dev/null; rm -f /tmp/verify-install.sh /tmp/.resend_key_value'
+
+      - name: Clean up key
+        if: always()
+        run: rm -f ~/.ssh/id_rsa
