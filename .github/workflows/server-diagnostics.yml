@@ -20,7 +20,7 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Inspect existing nse-tracker setup
+      - name: Locate collaborator's nse-tracker source
         env:
           AWS_HOST: ${{ secrets.AWS_HOST }}
           AWS_USER: ${{ secrets.AWS_USER }}
@@ -28,30 +28,29 @@ jobs:
           ssh-keyscan -H "$AWS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
           ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa "$AWS_USER@$AWS_HOST" 'bash -s' <<'REMOTE'
             set +e
-            echo "=== nginx: nse-tracker.dukaribu.com ==="
-            sudo -n cat /etc/nginx/sites-available/nse-tracker.dukaribu.com 2>&1
+            echo "=== /var/www/nse-tracker top-level layout ==="
+            sudo -n find /var/www/nse-tracker -maxdepth 2 -not -path "*/node_modules*" 2>&1
             echo
-            echo "=== nginx: nse.dukaribu.com ==="
-            sudo -n cat /etc/nginx/sites-available/nse.dukaribu.com 2>&1
+            echo "=== git remote (if /var/www/nse-tracker is a checkout) ==="
+            sudo -n git -C /var/www/nse-tracker remote -v 2>&1
+            sudo -n git -C /var/www/nse-tracker log -1 --oneline 2>&1
             echo
-            echo "=== nse-webhook.service unit file ==="
-            systemctl cat nse-webhook.service 2>&1
+            echo "=== git remote (if the api/ subdir is its own checkout) ==="
+            sudo -n git -C /var/www/nse-tracker/api remote -v 2>&1
+            sudo -n git -C /var/www/nse-tracker/deploy remote -v 2>&1
             echo
-            echo "=== nse-webhook.service recent logs ==="
-            sudo -n journalctl -u nse-webhook.service --no-pager -n 50 2>&1
+            echo "=== deploy script contents ==="
+            sudo -n find /var/www/nse-tracker/deploy -maxdepth 1 -type f 2>&1
+            for f in /var/www/nse-tracker/deploy/*.mjs /var/www/nse-tracker/deploy/*.sh; do
+              echo "--- $f ---"
+              sudo -n cat "$f" 2>&1
+            done
             echo
-            echo "=== pm2 process list ==="
-            pm2 ls 2>&1
+            echo "=== pm2 process env for nse-tracker-api (as www-data) ==="
+            sudo -n -u www-data pm2 describe nse-tracker-api 2>&1
             echo
-            echo "=== crontab (ubuntu user) ==="
-            crontab -l 2>&1
-            echo
-            echo "=== nse-related directories (excluding node_modules/dist/.git) ==="
-            find /home /var/www /opt /srv -maxdepth 3 -iname "*nse*" \
-              -not -path "*/node_modules/*" -not -path "*/dist/*" -not -path "*/.git/*" 2>/dev/null
-            echo
-            echo "=== nse_db tables (if reachable) ==="
-            sudo -n -u postgres psql -d nse_db -c "\dt" 2>&1
+            echo "=== www-data's pm2 process list ==="
+            sudo -n -u www-data pm2 ls 2>&1
           REMOTE
 
       - name: Clean up key
