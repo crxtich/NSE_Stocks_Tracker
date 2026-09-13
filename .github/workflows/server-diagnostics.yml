@@ -20,7 +20,7 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Get the real git remote URL
+      - name: Dump api-server source files
         env:
           AWS_HOST: ${{ secrets.AWS_HOST }}
           AWS_USER: ${{ secrets.AWS_USER }}
@@ -28,15 +28,12 @@ jobs:
           ssh-keyscan -H "$AWS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
           ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa "$AWS_USER@$AWS_HOST" 'bash -s' <<'REMOTE'
             set +e
-            SAFE="-c safe.directory=/var/www/nse-tracker/src"
-            echo "=== git remote for /var/www/nse-tracker/src ==="
-            sudo -n git $SAFE -C /var/www/nse-tracker/src remote -v 2>&1
-            echo
-            echo "=== recent commits ==="
-            sudo -n git $SAFE -C /var/www/nse-tracker/src log -8 --oneline 2>&1
-            echo
-            echo "=== directory owner ==="
-            sudo -n stat -c '%U:%G %n' /var/www/nse-tracker/src 2>&1
+            DIR=/var/www/nse-tracker/src/api-server
+            for f in package.json server.js routes.js db.js validate.js scrape.js; do
+              echo "##### FILE_START: $f #####"
+              sudo -n cat "$DIR/$f" 2>&1
+              echo "##### FILE_END: $f #####"
+            done
           REMOTE
 
       - name: Clean up key
