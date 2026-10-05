@@ -1,0 +1,15 @@
+name: Debug public sites (read-only)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check public endpoints
+        run: |
+          for url in https://crotich.com/ https://nse-tracker.crotich.com/ https://poetry.crotich.com/; do
+            echo "=== $url ==="
+            curl -s -o /dev/null -w "HTTP %{http_code}\n" -L "$url"
+          done
