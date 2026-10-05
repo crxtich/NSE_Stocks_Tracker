@@ -1,0 +1,58 @@
+# One-time (re-runnable) setup: adds an nginx vhost for
+# nse-tracker.crotich.com that 301-redirects to nse-tracker.dukaribu.com
+# (the real app, already on this same server), with its own TLS cert via
+# certbot. Replaces the old GitHub Pages redirect page — run this AFTER
+# nse-tracker.crotich.com's DNS points at this server's IP (certbot's
+# HTTP-01 challenge needs that to already be true). Safe to re-run.
+name: Set up nse-tracker.crotich.com redirect
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up SSH key
+        env:
+          SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Configure nginx + certbot
+        env:
+          AWS_HOST: ${{ secrets.AWS_HOST }}
+          AWS_USER: ${{ secrets.AWS_USER }}
+        run: |
+          ssh-keyscan -H "$AWS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          SSH="ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa $AWS_USER@$AWS_HOST"
+
+          $SSH 'mkdir -p /tmp/crotich-redirect-setup'
+
+          $SSH 'cat > /tmp/crotich-redirect-setup/nse-tracker.crotich.com' <<'NGINX'
+          server {
+              listen 80;
+              listen [::]:80;
+              server_name nse-tracker.crotich.com;
+
+              location / {
+                  return 301 https://nse-tracker.dukaribu.com$request_uri;
+              }
+          }
+          NGINX
+
+          $SSH 'sudo -n mv /tmp/crotich-redirect-setup/nse-tracker.crotich.com /etc/nginx/sites-available/nse-tracker.crotich.com && \
+            sudo -n ln -sf /etc/nginx/sites-available/nse-tracker.crotich.com /etc/nginx/sites-enabled/nse-tracker.crotich.com && \
+            sudo -n nginx -t && sudo -n systemctl reload nginx'
+
+          echo "=== requesting TLS certificate ==="
+          $SSH 'sudo -n certbot --nginx --non-interactive --agree-tos -m rotich.collins96@gmail.com -d nse-tracker.crotich.com --redirect'
+
+          echo "=== final nginx test + reload ==="
+          $SSH 'sudo -n nginx -t && sudo -n systemctl reload nginx && echo OK'
+
+      - name: Clean up key
+        if: always()
+        run: rm -f ~/.ssh/id_rsa
