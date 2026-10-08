@@ -20,13 +20,9 @@ export default function Layout({ children }: { children: ReactNode }) {
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
             <NavLink to="/" className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-md bg-accent/10 text-accent">
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none">
-                  <path d="M4 16 L9 10 L13 13.5 L20 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
-              <span className="font-display text-[15px] font-semibold tracking-tight text-ink sm:text-base">
-                NSE Market Intelligence
+              <span className="font-serif leading-tight text-ink">
+                <span className="text-[17px]">NSE</span>{' '}
+                <i className="block whitespace-nowrap text-[13px] text-ink-muted sm:inline sm:text-[17px] sm:text-ink">Market Intelligence</i>
               </span>
             </NavLink>
           </div>

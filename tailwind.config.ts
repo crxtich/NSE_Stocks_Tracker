@@ -45,15 +45,25 @@ export default {
       },
       fontFamily: {
         // Self-hosted via @fontsource (bundled by Vite), no font CDN calls.
-        sans: ['"Fira Sans"', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
-        display: ['"Fira Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        mono: ['"Fira Code"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        sans: ['Archivo', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        display: ['Archivo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        // Numbers and tickers use Archivo's tabular figures rather than a code font.
+        mono: ['Archivo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        // Book type for the wordmark and page titles, shared with crotich.com.
+        serif: ['"Libre Caslon Text"', 'Georgia', '"Times New Roman"', 'serif'],
       },
       fontFeatureSettings: {
         tabular: '"tnum"',
       },
       boxShadow: {
         none: 'none',
+      },
+      // Flatter corners: closer to print than to an app kit.
+      borderRadius: {
+        md: '3px',
+        lg: '4px',
+        xl: '4px',
+        '2xl': '6px',
       },
       keyframes: {
         countup: {

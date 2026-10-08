@@ -18,7 +18,7 @@ export default function ThemeToggle() {
     // script sets the same tag's initial value before first paint.
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', theme === 'dark' ? '#0B0D10' : '#F7F8FA')
+      ?.setAttribute('content', theme === 'dark' ? '#111111' : '#FFFFFF')
     try {
       localStorage.setItem('theme', theme)
     } catch {

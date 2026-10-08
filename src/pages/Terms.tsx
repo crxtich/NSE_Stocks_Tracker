@@ -2,7 +2,7 @@ export default function Terms() {
   return (
     <div className="mx-auto max-w-2xl space-y-6 text-sm leading-relaxed text-ink-muted">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-ink sm:text-3xl">Terms of Use</h1>
+        <h1 className="font-serif text-2xl font-normal text-ink sm:text-3xl">Terms of Use</h1>
         <p className="mt-1 text-xs text-ink-faint">Last updated 13 September 2026</p>
       </div>
 
