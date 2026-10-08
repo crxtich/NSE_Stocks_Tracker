@@ -1,4 +1,5 @@
 import { useRef, useState, type MouseEvent } from 'react'
+import { useElementWidth } from '../hooks/useElementWidth'
 import { formatCompactVolume } from '../lib/format'
 
 export interface VolumePoint {
@@ -6,17 +7,17 @@ export interface VolumePoint {
   volume: number | null
 }
 
-const WIDTH = 600
 const HEIGHT = 120
 const PAD_LEFT = 48
 const PAD_RIGHT = 8
 const PAD_TOP = 4
 const PAD_BOTTOM = 4
-const PLOT_W = WIDTH - PAD_LEFT - PAD_RIGHT
 const PLOT_H = HEIGHT - PAD_TOP - PAD_BOTTOM
 
 export default function VolumeChart({ data }: { data: VolumePoint[] }) {
   const svgRef = useRef<SVGSVGElement>(null)
+  const WIDTH = useElementWidth(svgRef, 600)
+  const PLOT_W = WIDTH - PAD_LEFT - PAD_RIGHT
   const [hoverIdx, setHoverIdx] = useState<number | null>(null)
 
   if (data.length === 0) return null

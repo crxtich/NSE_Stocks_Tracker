@@ -10,45 +10,63 @@
      versions read fine on a near-black page but fail contrast on a light one
      when used as text/border color rather than a button fill. */
   :root {
-    --color-canvas: 247 248 250;
+    /* "Financial Dashboard" palette (UI UX Pro Max): trust navy, green/red P&L. */
+    --color-canvas: 246 248 251;
     --color-canvas-raised: 255 255 255;
     --color-canvas-panel: 255 255 255;
-    --color-canvas-border: 227 230 235;
+    --color-canvas-border: 226 232 240;
 
-    --color-ink: 18 21 26;
-    --color-ink-muted: 91 100 114;
-    --color-ink-faint: 139 147 161;
+    --color-ink: 15 23 42;
+    --color-ink-muted: 71 85 105;
+    --color-ink-faint: 100 116 139;
 
-    --color-accent: 181 121 30;
-    --color-accent-bright: 240 169 58;
+    --color-accent: 0 51 102;
+    --color-accent-bright: 29 78 216;
+    --color-accent-ink: 255 255 255;
 
-    --color-gain: 30 158 90;
-    --color-loss: 196 61 49;
+    --color-gain: 21 128 61;
+    --color-loss: 185 28 28;
 
     color-scheme: light;
   }
 
   .dark {
-    --color-canvas: 11 13 16;
-    --color-canvas-raised: 18 21 26;
-    --color-canvas-panel: 22 26 32;
-    --color-canvas-border: 36 42 50;
+    --color-canvas: 9 14 26;
+    --color-canvas-raised: 15 22 38;
+    --color-canvas-panel: 17 25 43;
+    --color-canvas-border: 33 45 69;
 
-    --color-ink: 245 247 250;
-    --color-ink-muted: 139 147 161;
-    --color-ink-faint: 86 94 107;
+    --color-ink: 241 245 249;
+    --color-ink-muted: 148 163 184;
+    --color-ink-faint: 115 131 157;
 
-    --color-accent: 240 169 58;
-    --color-accent-bright: 255 194 102;
+    --color-accent: 125 176 255;
+    --color-accent-bright: 165 200 255;
+    --color-accent-ink: 9 14 26;
 
-    --color-gain: 47 191 113;
-    --color-loss: 228 87 76;
+    --color-gain: 52 211 120;
+    --color-loss: 248 113 113;
 
     color-scheme: dark;
   }
 
   body {
     font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--color-accent-bright));
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 
   ::selection {

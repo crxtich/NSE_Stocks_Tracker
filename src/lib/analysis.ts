@@ -19,7 +19,7 @@ const TRADING_DAYS_PER_YEAR = 252
 // instead of hardcoding a day count that could drift out of sync with this.
 export const SIGNAL_WINDOW_DAYS = 20
 
-import type { PriceSnapshot } from './supabase'
+import type { PriceSnapshot } from './api'
 
 export interface DailyClose {
   /** Calendar date in EAT, formatted YYYY-MM-DD. */
