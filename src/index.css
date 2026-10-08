@@ -10,42 +10,43 @@
      versions read fine on a near-black page but fail contrast on a light one
      when used as text/border color rather than a button fill. */
   :root {
-    /* "Financial Dashboard" palette (UI UX Pro Max): trust navy, green/red P&L. */
-    --color-canvas: 246 248 251;
+    /* Black and white, the same family as crotich.com and the poetry site.
+       Green and red are kept only for gains and losses. */
+    --color-canvas: 255 255 255;
     --color-canvas-raised: 255 255 255;
     --color-canvas-panel: 255 255 255;
-    --color-canvas-border: 226 232 240;
+    --color-canvas-border: 228 228 228;
 
-    --color-ink: 15 23 42;
-    --color-ink-muted: 71 85 105;
-    --color-ink-faint: 100 116 139;
+    --color-ink: 20 20 20;
+    --color-ink-muted: 74 74 74;
+    --color-ink-faint: 112 112 112;
 
-    --color-accent: 0 51 102;
-    --color-accent-bright: 29 78 216;
+    --color-accent: 20 20 20;
+    --color-accent-bright: 20 20 20;
     --color-accent-ink: 255 255 255;
 
-    --color-gain: 21 128 61;
-    --color-loss: 185 28 28;
+    --color-gain: 15 122 74;
+    --color-loss: 180 35 24;
 
     color-scheme: light;
   }
 
   .dark {
-    --color-canvas: 9 14 26;
-    --color-canvas-raised: 15 22 38;
-    --color-canvas-panel: 17 25 43;
-    --color-canvas-border: 33 45 69;
+    --color-canvas: 17 17 17;
+    --color-canvas-raised: 22 22 22;
+    --color-canvas-panel: 24 24 24;
+    --color-canvas-border: 46 46 46;
 
-    --color-ink: 241 245 249;
-    --color-ink-muted: 148 163 184;
-    --color-ink-faint: 115 131 157;
+    --color-ink: 236 236 236;
+    --color-ink-muted: 189 189 189;
+    --color-ink-faint: 150 150 150;
 
-    --color-accent: 125 176 255;
-    --color-accent-bright: 165 200 255;
-    --color-accent-ink: 9 14 26;
+    --color-accent: 236 236 236;
+    --color-accent-bright: 255 255 255;
+    --color-accent-ink: 17 17 17;
 
-    --color-gain: 52 211 120;
-    --color-loss: 248 113 113;
+    --color-gain: 74 210 140;
+    --color-loss: 255 120 110;
 
     color-scheme: dark;
   }

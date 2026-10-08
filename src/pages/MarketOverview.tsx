@@ -49,7 +49,7 @@ export default function MarketOverview() {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-ink sm:text-3xl">Market Overview</h1>
+          <h1 className="font-serif text-2xl font-normal text-ink sm:text-3xl">Market Overview</h1>
           <p className="mt-1 text-sm text-ink-muted">
             Live prices for every stock tracked on the Nairobi Securities Exchange.
           </p>

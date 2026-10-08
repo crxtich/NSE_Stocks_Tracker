@@ -84,7 +84,7 @@ export default function StockDetail() {
           <div>
             <div className="flex items-center gap-2">
               <span className="font-mono text-sm font-semibold text-accent">{analysis.ticker}</span>
-              <h1 className="font-display text-2xl font-semibold text-ink sm:text-3xl">{analysis.companyName}</h1>
+              <h1 className="font-serif text-2xl font-normal text-ink sm:text-3xl">{analysis.companyName}</h1>
             </div>
             <div className="mt-2 flex items-baseline gap-3">
               <span className="text-2xl font-semibold tabular text-ink">{formatKsh(analysis.latestPrice)}</span>
