@@ -3,7 +3,7 @@ export default function Privacy() {
     <div className="mx-auto max-w-2xl space-y-6 text-sm leading-relaxed text-ink-muted">
       <div>
         <h1 className="font-display text-2xl font-semibold text-ink sm:text-3xl">Privacy Policy</h1>
-        <p className="mt-1 text-xs text-ink-faint">Last updated 13 September 2026</p>
+        <p className="mt-1 text-xs text-ink-faint">Last updated 8 October 2026</p>
       </div>
 
       <p>
@@ -39,8 +39,9 @@ export default function Privacy() {
         <h2 className="font-display text-lg font-semibold text-ink">Third parties involved</h2>
         <ul className="mt-2 list-inside list-disc space-y-1.5">
           <li>
-            <span className="text-ink">Supabase</span> — hosts the database, including the
-            subscriber list, and the backend functions that process signups.
+            <span className="text-ink">Amazon Web Services (AWS)</span> — runs the server that
+            hosts this site, its database (including the subscriber list) and the code that
+            processes signups. The server is managed by the site's author.
           </li>
           <li>
             <span className="text-ink">Resend</span> — delivers the confirmation and update emails.
@@ -48,9 +49,6 @@ export default function Privacy() {
           <li>
             <span className="text-ink">Cloudflare</span> — provides DNS and anonymous, cookie-free
             traffic analytics for this domain (page views and referrers — no personal identifiers).
-          </li>
-          <li>
-            <span className="text-ink">GitHub Pages</span> — hosts the static site itself.
           </li>
         </ul>
       </section>
