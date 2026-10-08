@@ -52,7 +52,7 @@ export default function PriceTable({ rows }: { rows: PriceRow[] }) {
   const headers: { key: SortKey; label: string; align?: 'right' }[] = [
     { key: 'companyName', label: 'Company' },
     { key: 'price', label: 'Price', align: 'right' },
-    { key: 'changeKsh', label: 'Change', align: 'right' },
+    { key: 'changeKsh', label: 'Change (Ksh)', align: 'right' },
     { key: 'changePct', label: '% Change', align: 'right' },
     { key: 'volume', label: 'Volume', align: 'right' },
   ]
@@ -90,7 +90,7 @@ export default function PriceTable({ rows }: { rows: PriceRow[] }) {
               </td>
               <td className="px-3 py-2.5 text-right tabular text-ink">{formatKsh(row.price)}</td>
               <td className="hidden px-3 py-2.5 text-right sm:table-cell">
-                <ChangeValue value={row.changeKsh} />
+                <ChangeValue value={row.changeKsh} unit="ksh" />
               </td>
               <td className="px-3 py-2.5 text-right">
                 <ChangeValue value={row.changePct} />

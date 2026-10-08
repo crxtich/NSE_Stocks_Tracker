@@ -1,4 +1,5 @@
 import { useRef, useState, type MouseEvent } from 'react'
+import { useElementWidth } from '../hooks/useElementWidth'
 import { formatKsh } from '../lib/format'
 
 export interface PricePoint {
@@ -11,13 +12,11 @@ export interface PricePoint {
 // pointer position mapped back into data-space for the hover tooltip. Swaps
 // out Recharts (~109kB gzip) for a dependency-free component doing exactly
 // what this one chart needs.
-const WIDTH = 600
 const HEIGHT = 280
 const PAD_LEFT = 48
 const PAD_RIGHT = 8
 const PAD_TOP = 10
 const PAD_BOTTOM = 22
-const PLOT_W = WIDTH - PAD_LEFT - PAD_RIGHT
 const PLOT_H = HEIGHT - PAD_TOP - PAD_BOTTOM
 
 function niceTicks(min: number, max: number, count: number): number[] {
@@ -28,6 +27,8 @@ function niceTicks(min: number, max: number, count: number): number[] {
 
 export default function PriceChart({ data }: { data: PricePoint[] }) {
   const svgRef = useRef<SVGSVGElement>(null)
+  const WIDTH = useElementWidth(svgRef, 600)
+  const PLOT_W = WIDTH - PAD_LEFT - PAD_RIGHT
   const [hoverIdx, setHoverIdx] = useState<number | null>(null)
 
   if (data.length === 0) return null
@@ -99,7 +100,14 @@ export default function PriceChart({ data }: { data: PricePoint[] }) {
         ))}
 
         {xLabelIdxs.map((i) => (
-          <text key={data[i].date} x={xAt(i)} y={HEIGHT - 6} textAnchor="middle" fontSize={10} className="fill-ink-faint">
+          <text
+            key={data[i].date}
+            x={xAt(i)}
+            y={HEIGHT - 6}
+            textAnchor={i === data.length - 1 && data.length > 1 ? 'end' : 'middle'}
+            fontSize={10}
+            className="fill-ink-faint"
+          >
             {data[i].date}
           </text>
         ))}

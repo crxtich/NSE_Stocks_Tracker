@@ -33,10 +33,8 @@ export default {
         accent: {
           DEFAULT: withOpacity('--color-accent'),
           bright: withOpacity('--color-accent-bright'),
-          // Fixed, not theme-variable: text sitting on a bg-accent button/chip
-          // needs to stay dark regardless of the overall theme, since the
-          // accent color itself is bright in both light and dark mode.
-          ink: '#0B0D10',
+          // Text on a bg-accent fill: white on light-mode navy, dark on dark-mode blue.
+          ink: withOpacity('--color-accent-ink'),
         },
         gain: {
           DEFAULT: withOpacity('--color-gain'),
@@ -46,10 +44,10 @@ export default {
         },
       },
       fontFamily: {
-        // System font stacks only — no webfont CDN calls, so the page ships
-        // with zero font-loading network requests and no layout shift.
-        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['ui-serif', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
+        // Self-hosted via @fontsource (bundled by Vite), no font CDN calls.
+        sans: ['"Fira Sans"', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        display: ['"Fira Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: ['"Fira Code"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       fontFeatureSettings: {
         tabular: '"tnum"',

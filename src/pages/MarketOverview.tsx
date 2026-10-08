@@ -6,6 +6,8 @@ import MoversList from '../components/MoversList'
 import UpdateCountdown from '../components/UpdateCountdown'
 import SubscribeForm from '../components/SubscribeForm'
 import { LoadingState, ErrorState, EmptyState } from '../components/StateViews'
+import ChangeValue from '../components/ChangeValue'
+import { formatCompactVolume } from '../lib/format'
 
 export default function MarketOverview() {
   usePageTitle('Market Overview')
@@ -33,6 +35,16 @@ export default function MarketOverview() {
     return { gainers, losers, maxAbsChange }
   }, [rows])
 
+  const breadth = useMemo(() => {
+    const changes = rows.map((r) => r.changePct).filter((v): v is number => v !== null)
+    const up = changes.filter((v) => v > 0).length
+    const down = changes.filter((v) => v < 0).length
+    const flat = changes.length - up - down
+    const avg = changes.length ? changes.reduce((a, b) => a + b, 0) / changes.length : null
+    const volume = rows.reduce((a, r) => a + (r.volume ?? 0), 0)
+    return { up, down, flat, avg, volume, total: changes.length }
+  }, [rows])
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -44,8 +56,6 @@ export default function MarketOverview() {
         </div>
         <UpdateCountdown lastUpdated={lastUpdated} />
       </div>
-
-      <SubscribeForm />
 
       {loading && rows.length === 0 && <LoadingState />}
       {error && <ErrorState message={error} />}
@@ -59,13 +69,46 @@ export default function MarketOverview() {
 
       {rows.length > 0 && (
         <>
+          <section aria-label="Market summary" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="col-span-2 rounded-lg border border-canvas-border bg-canvas-raised p-4">
+              <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">Market breadth</div>
+              <div className="mt-1.5 flex items-baseline gap-3 font-display text-xl font-semibold text-ink">
+                <span className="text-gain">▲ {breadth.up}</span>
+                <span className="text-loss">▼ {breadth.down}</span>
+                {breadth.flat > 0 && <span className="text-ink-muted">= {breadth.flat}</span>}
+              </div>
+              <div
+                className="mt-3 flex h-2 overflow-hidden rounded-full bg-canvas-border"
+                role="img"
+                aria-label={`${breadth.up} stocks up, ${breadth.down} down, ${breadth.flat} unchanged`}
+              >
+                <div className="bg-gain" style={{ width: `${breadth.total ? (breadth.up / breadth.total) * 100 : 0}%` }} />
+                <div className="bg-ink-faint/40" style={{ width: `${breadth.total ? (breadth.flat / breadth.total) * 100 : 0}%` }} />
+                <div className="bg-loss" style={{ width: `${breadth.total ? (breadth.down / breadth.total) * 100 : 0}%` }} />
+              </div>
+            </div>
+            <div className="rounded-lg border border-canvas-border bg-canvas-raised p-4">
+              <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">Average move</div>
+              <div className="mt-1.5 font-display text-xl font-semibold">
+                <ChangeValue value={breadth.avg} />
+              </div>
+              <div className="mt-1 text-xs text-ink-faint">across {breadth.total} stocks</div>
+            </div>
+            <div className="rounded-lg border border-canvas-border bg-canvas-raised p-4">
+              <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">Shares traded</div>
+              <div className="mt-1.5 font-mono text-xl font-semibold tabular text-ink">{formatCompactVolume(breadth.volume)}</div>
+              <div className="mt-1 text-xs text-ink-faint">latest session</div>
+            </div>
+          </section>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <MoversList title="Top 5 Movers — Up" rows={gainers} maxAbsChange={maxAbsChange} />
-            <MoversList title="Top 5 Movers — Down" rows={losers} maxAbsChange={maxAbsChange} />
+            <MoversList title="Biggest gainers" rows={gainers} maxAbsChange={maxAbsChange} />
+            <MoversList title="Biggest losers" rows={losers} maxAbsChange={maxAbsChange} />
           </div>
           <PriceTable rows={rows} />
         </>
       )}
+
+      <SubscribeForm />
     </div>
   )
 }
