@@ -12,7 +12,7 @@ const EXPORT_PAGE_LIMIT = 100_000
 
 const SNAPSHOT_COLUMNS =
   'id, ticker, company_name, price::float8 AS price, change_ksh::float8 AS change_ksh, ' +
-  'change_pct::float8 AS change_pct, volume, scraped_at'
+  'change_pct::float8 AS change_pct, volume::float8 AS volume, scraped_at'
 
 function wrap(handler) {
   return (req, res, next) => Promise.resolve(handler(req, res)).catch(next)

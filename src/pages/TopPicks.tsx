@@ -23,7 +23,7 @@ export default function TopPicks() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="font-serif text-2xl font-normal text-ink sm:text-3xl">Top 10 Picks</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">Top 10 Picks</h1>
         <p className="mt-1 max-w-2xl text-sm text-ink-muted">
           The ten highest-scoring stocks on today's Market Signal Score, a purely quantitative
           ranking built from price and volume data alone.
@@ -81,7 +81,7 @@ export default function TopPicks() {
         </div>
       )}
 
-      <div className="rounded-lg border border-canvas-border bg-canvas-panel">
+      <div className="card">
         <button
           type="button"
           onClick={() => setShowMethodology((v) => !v)}

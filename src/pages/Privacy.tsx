@@ -2,7 +2,7 @@ export default function Privacy() {
   return (
     <div className="mx-auto max-w-2xl space-y-6 text-sm leading-relaxed text-ink-muted">
       <div>
-        <h1 className="font-serif text-2xl font-normal text-ink sm:text-3xl">Privacy Policy</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">Privacy Policy</h1>
         <p className="mt-1 text-xs text-ink-faint">Last updated 8 October 2026</p>
       </div>
 

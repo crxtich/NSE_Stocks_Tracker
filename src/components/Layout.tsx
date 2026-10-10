@@ -16,22 +16,32 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-canvas">
-      <header className="sticky top-0 z-20 border-b border-canvas-border bg-canvas/90 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+      <header className="sticky top-0 z-20 bg-navy text-white shadow-card">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:gap-4 sm:px-6">
           <div className="flex items-center gap-3">
             <NavLink to="/" className="flex items-center gap-2">
-              <span className="font-serif leading-tight text-ink">
-                <span className="text-[17px]">NSE</span>{' '}
-                <i className="block whitespace-nowrap text-[13px] text-ink-muted sm:inline sm:text-[17px] sm:text-ink">Market Intelligence</i>
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gold text-navy sm:h-8 sm:w-8">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
+                  <path d="M4 16 L9 10 L13 13.5 L20 6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+              <span className="leading-tight">
+                <span className="block whitespace-nowrap text-[15px] font-bold tracking-tight text-white sm:text-base">
+                  NSE<span className="hidden sm:inline"> Market Intelligence</span>
+                </span>
+                <span className="block whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.06em] text-gold sm:text-[11px] sm:tracking-[0.14em]">
+                  <span className="sm:hidden">Market Intelligence</span>
+                  <span className="hidden sm:inline">Nairobi Securities Exchange</span>
+                </span>
               </span>
             </NavLink>
           </div>
-          <div className="flex shrink-0 items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <a
               href="https://www.linkedin.com/in/crotich/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs text-ink-muted transition-colors hover:text-accent"
+              className="hidden items-center gap-1.5 text-xs text-white/70 transition-colors hover:text-white sm:flex"
             >
               <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0" fill="currentColor">
                 <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.15 1.45-2.15 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.59 0 4.25 2.37 4.25 5.44v6.3zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.11 20.45H3.56V9h3.55v11.45z" />
@@ -43,7 +53,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               onClick={() => setExportOpen(true)}
               title="Export data"
               aria-label="Export data"
-              className="flex items-center gap-1.5 rounded-md border border-canvas-border px-2 py-1 text-xs text-ink-muted transition-colors hover:border-accent/50 hover:text-accent"
+              className="hidden items-center gap-1.5 rounded-md border border-white/20 px-2 py-1 text-xs text-white/80 transition-colors hover:border-gold hover:text-white min-[360px]:flex"
             >
               <Download className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
               <span className="hidden sm:inline">Export</span>
@@ -52,7 +62,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             <MarketStatusBadge />
           </div>
         </div>
-        <nav className="border-t border-canvas-border/60">
+        <nav className="border-t border-white/10">
           <div className="mx-auto flex max-w-7xl overflow-x-auto px-4 sm:gap-1 sm:px-6">
             {NAV_ITEMS.map((item) => (
               <NavLink
@@ -62,8 +72,8 @@ export default function Layout({ children }: { children: ReactNode }) {
                 className={({ isActive }) =>
                   `whitespace-nowrap border-b-2 px-2 py-2.5 text-[13px] font-medium transition-colors sm:px-3 sm:text-sm ${
                     isActive
-                      ? 'border-accent text-ink'
-                      : 'border-transparent text-ink-muted hover:text-ink'
+                      ? 'border-gold text-white'
+                      : 'border-transparent text-white/65 hover:text-white'
                   }`
                 }
               >

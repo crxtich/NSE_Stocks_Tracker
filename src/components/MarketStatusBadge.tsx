@@ -11,14 +11,15 @@ export default function MarketStatusBadge() {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${
+      className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-medium ${
         open
-          ? 'border-gain/30 bg-gain/10 text-gain'
-          : 'border-canvas-border bg-canvas-panel text-ink-muted'
+          ? 'border-emerald-300/40 bg-emerald-400/15 text-emerald-200'
+          : 'border-white/20 bg-white/10 text-white/80'
       }`}
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${open ? 'bg-gain' : 'bg-ink-faint'}`} />
-      {open ? 'Market Open' : 'Market Closed'}
+      <span className={`h-1.5 w-1.5 rounded-full ${open ? 'bg-emerald-300' : 'bg-white/50'}`} />
+      <span className="hidden sm:inline">Market </span>
+      {open ? 'Open' : 'Closed'}
     </span>
   )
 }

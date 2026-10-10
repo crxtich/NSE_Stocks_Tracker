@@ -49,7 +49,7 @@ export default function MarketOverview() {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="font-serif text-2xl font-normal text-ink sm:text-3xl">Market Overview</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">Market Overview</h1>
           <p className="mt-1 text-sm text-ink-muted">
             Live prices for every stock tracked on the Nairobi Securities Exchange.
           </p>
@@ -69,34 +69,34 @@ export default function MarketOverview() {
 
       {rows.length > 0 && (
         <>
-          <section aria-label="Market summary" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <div className="col-span-2 rounded-lg border border-canvas-border bg-canvas-raised p-4">
-              <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">Market breadth</div>
-              <div className="mt-1.5 flex items-baseline gap-3 font-display text-xl font-semibold text-ink">
-                <span className="text-gain">▲ {breadth.up}</span>
-                <span className="text-loss">▼ {breadth.down}</span>
-                {breadth.flat > 0 && <span className="text-ink-muted">= {breadth.flat}</span>}
+          <section aria-label="Market summary" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <div className="col-span-2 min-w-0 rounded-xl bg-navy p-5 text-white shadow-card">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/60">Market breadth</div>
+              <div className="mt-1.5 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-2xl font-bold">
+                <span className="text-emerald-300">▲ {breadth.up}</span>
+                <span className="text-red-300">▼ {breadth.down}</span>
+                {breadth.flat > 0 && <span className="text-white/60">= {breadth.flat}</span>}
               </div>
               <div
-                className="mt-3 flex h-2 overflow-hidden rounded-full bg-canvas-border"
+                className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-white/15"
                 role="img"
                 aria-label={`${breadth.up} stocks up, ${breadth.down} down, ${breadth.flat} unchanged`}
               >
-                <div className="bg-gain" style={{ width: `${breadth.total ? (breadth.up / breadth.total) * 100 : 0}%` }} />
-                <div className="bg-ink-faint/40" style={{ width: `${breadth.total ? (breadth.flat / breadth.total) * 100 : 0}%` }} />
-                <div className="bg-loss" style={{ width: `${breadth.total ? (breadth.down / breadth.total) * 100 : 0}%` }} />
+                <div className="bg-emerald-400" style={{ width: `${breadth.total ? (breadth.up / breadth.total) * 100 : 0}%` }} />
+                <div className="bg-white/35" style={{ width: `${breadth.total ? (breadth.flat / breadth.total) * 100 : 0}%` }} />
+                <div className="bg-red-400" style={{ width: `${breadth.total ? (breadth.down / breadth.total) * 100 : 0}%` }} />
               </div>
             </div>
-            <div className="rounded-lg border border-canvas-border bg-canvas-raised p-4">
-              <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">Average move</div>
-              <div className="mt-1.5 font-display text-xl font-semibold">
+            <div className="card min-w-0 p-5">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Average move</div>
+              <div className="kpi-value mt-1.5 text-2xl font-bold">
                 <ChangeValue value={breadth.avg} />
               </div>
               <div className="mt-1 text-xs text-ink-faint">across {breadth.total} stocks</div>
             </div>
-            <div className="rounded-lg border border-canvas-border bg-canvas-raised p-4">
-              <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">Shares traded</div>
-              <div className="mt-1.5 font-mono text-xl font-semibold tabular text-ink">{formatCompactVolume(breadth.volume)}</div>
+            <div className="card min-w-0 p-5">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Shares traded</div>
+              <div className="kpi-value mt-1.5 text-2xl font-bold tabular text-ink" title={breadth.volume.toLocaleString()}>{formatCompactVolume(breadth.volume)}</div>
               <div className="mt-1 text-xs text-ink-faint">latest session</div>
             </div>
           </section>

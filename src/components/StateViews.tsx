@@ -1,6 +1,6 @@
 export function LoadingState({ label = 'Loading market data…' }: { label?: string }) {
   return (
-    <div className="flex items-center justify-center gap-3 rounded-lg border border-canvas-border bg-canvas-panel py-16 text-sm text-ink-muted">
+    <div className="flex items-center justify-center gap-3 card py-16 text-sm text-ink-muted">
       <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-ink-faint border-t-accent" />
       {label}
     </div>

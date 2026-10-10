@@ -14,7 +14,7 @@ export default function MoversList({
   maxAbsChange: number
 }) {
   return (
-    <div className="rounded-lg border border-canvas-border bg-canvas-raised p-4">
+    <div className="card p-4">
       <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">{title}</h3>
       <ul className="mt-3 divide-y divide-canvas-border/60">
         {rows.length === 0 && <li className="py-3 text-sm text-ink-faint">No data yet.</li>}

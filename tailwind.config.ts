@@ -36,6 +36,11 @@ export default {
           // Text on a bg-accent fill: white on light-mode navy, dark on dark-mode blue.
           ink: withOpacity('--color-accent-ink'),
         },
+        gold: {
+          DEFAULT: withOpacity('--color-gold'),
+          ink: withOpacity('--color-gold-ink'),
+        },
+        navy: '#02182f',
         gain: {
           DEFAULT: withOpacity('--color-gain'),
         },
@@ -49,21 +54,20 @@ export default {
         display: ['Archivo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         // Numbers and tickers use Archivo's tabular figures rather than a code font.
         mono: ['Archivo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        // Book type for the wordmark and page titles, shared with crotich.com.
-        serif: ['"Libre Caslon Text"', 'Georgia', '"Times New Roman"', 'serif'],
+
       },
       fontFeatureSettings: {
         tabular: '"tnum"',
       },
       boxShadow: {
         none: 'none',
+        card: '0 1px 2px rgb(13 27 46 / 0.04), 0 1px 3px rgb(13 27 46 / 0.06)',
       },
-      // Flatter corners: closer to print than to an app kit.
       borderRadius: {
-        md: '3px',
-        lg: '4px',
-        xl: '4px',
-        '2xl': '6px',
+        md: '6px',
+        lg: '10px',
+        xl: '10px',
+        '2xl': '12px',
       },
       keyframes: {
         countup: {

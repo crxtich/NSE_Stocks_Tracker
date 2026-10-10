@@ -40,7 +40,7 @@ export default function SubscribeForm() {
   }
 
   return (
-    <div className="rounded-lg border border-canvas-border bg-canvas-panel p-5">
+    <div className="card p-5">
       <div className="flex items-center gap-2">
         <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-accent/10 text-accent">
           <Mail className="h-3.5 w-3.5" strokeWidth={2} />

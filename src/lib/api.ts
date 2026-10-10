@@ -20,6 +20,26 @@ export interface PriceSnapshot {
   scraped_at: string
 }
 
+// Postgres sends BIGINT and NUMERIC columns as strings. Adding those up joins
+// them as text ("10316924" + "556331"...), so every numeric field is coerced
+// here, once, before anything downstream does arithmetic with it.
+function toNumber(v: unknown): number | null {
+  if (v === null || v === undefined || v === '') return null
+  const n = typeof v === 'number' ? v : Number(v)
+  return Number.isFinite(n) ? n : null
+}
+
+function normalizeSnapshot(s: PriceSnapshot): PriceSnapshot {
+  return {
+    ...s,
+    id: Number(s.id),
+    price: toNumber(s.price) ?? 0,
+    change_ksh: toNumber(s.change_ksh),
+    change_pct: toNumber(s.change_pct),
+    volume: toNumber(s.volume),
+  }
+}
+
 export interface WatchlistEntry {
   ticker: string
   company_name: string
@@ -38,7 +58,7 @@ export async function fetchWatchlist(): Promise<WatchlistEntry[]> {
 // Fetches every snapshot within the last `days` days, across all tickers,
 // ordered oldest -> newest so downstream analysis can walk it chronologically.
 export async function fetchHistory(days: number): Promise<PriceSnapshot[]> {
-  return apiGet<PriceSnapshot[]>(`history?days=${days}`)
+  return (await apiGet<PriceSnapshot[]>(`history?days=${days}`)).map(normalizeSnapshot)
 }
 
 // Fetches every snapshot between two optional bounds (either end omitted
@@ -52,5 +72,5 @@ export async function fetchSnapshotsInRange(
   const params = new URLSearchParams()
   if (fromIso) params.set('from', fromIso)
   if (toIso) params.set('to', toIso)
-  return apiGet<PriceSnapshot[]>(`snapshots?${params.toString()}`)
+  return (await apiGet<PriceSnapshot[]>(`snapshots?${params.toString()}`)).map(normalizeSnapshot)
 }

@@ -84,7 +84,7 @@ export default function StockDetail() {
           <div>
             <div className="flex items-center gap-2">
               <span className="font-mono text-sm font-semibold text-accent">{analysis.ticker}</span>
-              <h1 className="font-serif text-2xl font-normal text-ink sm:text-3xl">{analysis.companyName}</h1>
+              <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{analysis.companyName}</h1>
             </div>
             <div className="mt-2 flex items-baseline gap-3">
               <span className="text-2xl font-semibold tabular text-ink">{formatKsh(analysis.latestPrice)}</span>
@@ -96,7 +96,7 @@ export default function StockDetail() {
         </div>
       </div>
 
-      <section className="rounded-lg border border-canvas-border bg-canvas-panel p-4">
+      <section className="card p-4">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-ink">Price History</h2>
           <div className="flex gap-1 rounded-md bg-canvas p-1 text-xs">
@@ -196,7 +196,7 @@ export default function StockDetail() {
 
       <DataMaturityNotice />
 
-      <section className="rounded-lg border border-canvas-border bg-canvas-panel p-4">
+      <section className="card p-4">
         <h2 className="text-sm font-semibold text-ink">Signal Score Breakdown</h2>
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
