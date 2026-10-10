@@ -16,7 +16,7 @@ export default function MetricTile({
   sub?: ReactNode
 }) {
   return (
-    <div className="rounded-lg border border-canvas-border bg-canvas-panel px-4 py-3.5">
+    <div className="card min-w-0 px-4 py-3.5">
       <Tooltip text={`${technical} — ${help}`}>
         <button
           type="button"
@@ -26,7 +26,7 @@ export default function MetricTile({
           <Info className="h-3 w-3 text-ink-faint" strokeWidth={1.75} />
         </button>
       </Tooltip>
-      <div className="mt-1.5 text-lg font-semibold tabular text-ink">{value}</div>
+      <div className="mt-1.5 break-words text-lg font-bold tabular text-ink">{value}</div>
       {sub && <div className="mt-0.5 text-xs text-ink-muted">{sub}</div>}
     </div>
   )

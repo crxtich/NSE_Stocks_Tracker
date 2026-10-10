@@ -18,7 +18,7 @@ export default function ThemeToggle() {
     // script sets the same tag's initial value before first paint.
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', theme === 'dark' ? '#111111' : '#FFFFFF')
+      ?.setAttribute('content', theme === 'dark' ? '#07111F' : '#02182F')
     try {
       localStorage.setItem('theme', theme)
     } catch {
@@ -32,7 +32,7 @@ export default function ThemeToggle() {
       onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
       title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
       aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-canvas-border text-ink-muted transition-colors hover:border-accent/50 hover:text-accent"
+      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-white/20 text-white/80 transition-colors hover:border-gold hover:text-white"
     >
       {theme === 'dark' ? <Sun className="h-3.5 w-3.5" strokeWidth={2} /> : <Moon className="h-3.5 w-3.5" strokeWidth={2} />}
     </button>

@@ -10,20 +10,23 @@
      versions read fine on a near-black page but fail contrast on a light one
      when used as text/border color rather than a button fill. */
   :root {
-    /* Black and white, the same family as crotich.com and the poetry site.
-       Green and red are kept only for gains and losses. */
-    --color-canvas: 255 255 255;
+    /* Navy and gold on a light grey page, the same design family as
+       nyamachama.crotich.com. Green and red only for gains and losses. */
+    --color-canvas: 243 244 246;
     --color-canvas-raised: 255 255 255;
     --color-canvas-panel: 255 255 255;
-    --color-canvas-border: 228 228 228;
+    --color-canvas-border: 229 231 235;
 
-    --color-ink: 20 20 20;
-    --color-ink-muted: 74 74 74;
-    --color-ink-faint: 112 112 112;
+    --color-ink: 13 27 46;
+    --color-ink-muted: 91 102 117;
+    --color-ink-faint: 120 130 145;
 
-    --color-accent: 20 20 20;
-    --color-accent-bright: 20 20 20;
+    --color-accent: 2 24 47;
+    --color-accent-bright: 18 52 92;
     --color-accent-ink: 255 255 255;
+
+    --color-gold: 217 165 78;
+    --color-gold-ink: 138 97 22;
 
     --color-gain: 15 122 74;
     --color-loss: 180 35 24;
@@ -32,18 +35,21 @@
   }
 
   .dark {
-    --color-canvas: 17 17 17;
-    --color-canvas-raised: 22 22 22;
-    --color-canvas-panel: 24 24 24;
-    --color-canvas-border: 46 46 46;
+    --color-canvas: 7 17 31;
+    --color-canvas-raised: 14 28 48;
+    --color-canvas-panel: 17 33 56;
+    --color-canvas-border: 33 50 77;
 
-    --color-ink: 236 236 236;
-    --color-ink-muted: 189 189 189;
-    --color-ink-faint: 150 150 150;
+    --color-ink: 232 237 243;
+    --color-ink-muted: 168 180 196;
+    --color-ink-faint: 128 141 160;
 
-    --color-accent: 236 236 236;
-    --color-accent-bright: 255 255 255;
-    --color-accent-ink: 17 17 17;
+    --color-accent: 217 165 78;
+    --color-accent-bright: 236 196 128;
+    --color-accent-ink: 7 17 31;
+
+    --color-gold: 217 165 78;
+    --color-gold-ink: 236 196 128;
 
     --color-gain: 74 210 140;
     --color-loss: 255 120 110;
@@ -91,5 +97,13 @@
 @layer utilities {
   .tabular {
     font-variant-numeric: tabular-nums;
+  }
+  /* Card surface: white tile with a hairline border and a soft shadow. */
+  .card {
+    @apply rounded-xl border border-canvas-border bg-canvas-raised shadow-card;
+  }
+  /* KPI tile numbers never spill out of their tile. */
+  .kpi-value {
+    @apply min-w-0 truncate;
   }
 }
