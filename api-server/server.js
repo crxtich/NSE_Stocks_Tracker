@@ -7,6 +7,9 @@ const app = express()
 const PORT = Number(process.env.PORT) || 3015
 
 app.disable('x-powered-by')
+// nginx on the same box is the only client; take the visitor's IP from the
+// X-Forwarded-For it adds (used by the signup limits).
+app.set('trust proxy', 'loopback')
 app.use(express.json({ limit: '8kb' }))
 app.use('/', routes)
 
