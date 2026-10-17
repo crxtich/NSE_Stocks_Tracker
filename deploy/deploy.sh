@@ -127,8 +127,9 @@ if ! diff -q "$REL/api-server/package.json" "$API/package.json" >/dev/null 2>&1;
   (cd "$API" && npm install --omit=dev --no-audit --no-fund >>"$LOG" 2>&1) \
     || fail "api dependency install failed"
 fi
-for f in server.js routes.js db.js validate.js scrape.js email.js; do
-  [ -f "$REL/api-server/$f" ] && cp "$REL/api-server/$f" "$API/$f"
+# Every .js file, so a new module is never left behind on the server.
+for src in "$REL"/api-server/*.js; do
+  cp "$src" "$API/$(basename "$src")"
 done
 log "api sources updated"
 
