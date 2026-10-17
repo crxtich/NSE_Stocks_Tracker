@@ -4,6 +4,7 @@ const express = require('express')
 const { query } = require('./db')
 const { parseDays, parseIsoDate, parseEmail, ValidationError } = require('./validate')
 const { wrapEmailHtml, sendEmail, SITE_URL } = require('./email')
+const { signupBlock } = require('./limits')
 
 const router = express.Router()
 
@@ -13,6 +14,9 @@ const EXPORT_PAGE_LIMIT = 100_000
 const SNAPSHOT_COLUMNS =
   'id, ticker, company_name, price::float8 AS price, change_ksh::float8 AS change_ksh, ' +
   'change_pct::float8 AS change_pct, volume::float8 AS volume, scraped_at'
+
+const escapeHtml = (s) =>
+  String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 
 function wrap(handler) {
   return (req, res, next) => Promise.resolve(handler(req, res)).catch(next)
@@ -73,6 +77,15 @@ router.post('/subscribe', wrap(async (req, res) => {
   }
 
   const email = parseEmail(req.body?.email)
+
+  const block = signupBlock(req.ip, email)
+  if (block === 'email') {
+    // Just sent one to this address: answer the same way without sending again.
+    return res.json({ status: 'ok', message: 'Check your inbox to confirm your subscription.' })
+  }
+  if (block) {
+    return res.status(429).json({ status: 'error', message: 'Too many signups right now. Please try again in an hour.' })
+  }
 
   const { rows: existingRows } = await query(
     'SELECT id, confirmed FROM newsletter_subscribers WHERE email = $1',
@@ -145,7 +158,7 @@ router.get('/confirm-subscription', wrap(async (req, res) => {
     await sendEmail(
       ownerEmail,
       'New newsletter subscriber',
-      wrapEmailHtml(`<p>${subscriber.email} just confirmed their subscription.</p>`),
+      wrapEmailHtml(`<p>${escapeHtml(subscriber.email)} just confirmed their subscription.</p>`),
     ).catch((err) => console.error('[nse-api] owner notification failed:', err.message))
   }
 
